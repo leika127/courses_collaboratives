@@ -97,12 +97,12 @@ cd frontend && npm install && cd ..
 Copier le fichier d'exemple, puis remplir les valeurs :
 
 ```bash
-cp backend/.env.example backend/.env
+cp backend/.env.exemple backend/.env
 ```
 
 | Variable | Rôle | Exemple |
 |---|---|---|
-| À compléter selon `.env.example` | | |
+| À compléter selon `.env.exemple` | | |
 
 ⚠️ Le fichier `backend/.env` contient des mots de passe : il est ignoré par Git et ne doit **jamais** être commité.
 
@@ -236,7 +236,7 @@ courses_collaboratives/
 │   │   └── server.js        # Point d'entrée du serveur
 │   ├── requetes/            # Requêtes SQL
 │   ├── docker-compose.yml   # Conteneur PostgreSQL
-│   ├── .env.example         # Modèle des variables d'environnement
+│   ├── .env.exemple         # Modèle des variables d'environnement
 │   └── package.json
 ├── frontend/
 │   ├── public/
