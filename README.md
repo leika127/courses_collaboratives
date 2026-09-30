@@ -25,18 +25,25 @@ Projet réalisé à Ada Tech School dans le cadre du projet Lovelace Factory.
 
 ### Problématique
 
-> À compléter : le vrai problème que l'application résout, en 2 ou 3 phrases.
+Les familles doivent gérer les courses tout en gérant le budjet qui leur est attribué. Très souvent, les courses sont notées sur papier et sont oubliées ou perdues. Les personnes doivent donc se rappeler cedont ils ont besoin.
 
 ### Cible prioritaire
 
-> À compléter : qui est la cible prioritaire, et pourquoi elle.
+cette appli ciblera les familles mais principalement la personne du foyer qui fera les courses (le parent)
 
 ### Périmètre de la V1
 
 | Dans la V1 | Hors V1 (plus tard) |
 |---|---|
-| À compléter | À compléter |
-
+|Création de liste de courses par catégories et sous-catégories | vérification de liste |
+|Possibilité de fixer un budjet | l'ajout de personnes via l'utilisateur principal |
+|L'ajout de courses se fait en direct par chaque personne du foyer | gestions des droits pour chaque user |
+|La fonction de connexion | le suivi du budjet
+|Suppression des doublons d'achat ajoutés par erreur | mettre une alerte en cas d'ajout sur la liste par les enfants |
+|---| alarme pour rappeler la liste (logo de rappel) |
+|---| alarme lors de l'ajout de courses |
+|---| possibilité suivre 2 achats de courses pour comparer |
+|---| transformer l'application web en application mobile pure |
 ---
 
 ## Stack technique
@@ -109,7 +116,7 @@ cd ..
 
 ### 5. Créer les tables et les données de test
 
-> À compléter une fois `docker-compose.yml` écrit : commande pour exécuter `sql/migration_up.sql` puis `sql/seed.sql`.
+> À compléter une fois `docker-compose.yml` écrit : commande pour exécuter `sql/migration_up.sql` puis `sql/migration_down.sql`.
 
 ---
 
@@ -126,7 +133,7 @@ Cette commande lance le backend et le frontend en même temps (grâce à `concur
 | Service | Adresse |
 |---|---|
 | Frontend | http://localhost:5173 |
-| API (backend) | http://localhost:À_COMPLÉTER |
+| API (backend) | http://localhost:3000 |
 
 ### Arrêter le projet
 
@@ -135,7 +142,7 @@ Cette commande lance le backend et le frontend en même temps (grâce à `concur
 
 ```bash
 cd backend
-docker compose down
+docker compose down 
 cd ..
 ```
 
@@ -178,7 +185,7 @@ Cette section explique leur rôle et la commande utilisée pour les ajouter.
 
 | Paquet | Type | Rôle |
 |---|---|---|
-| `concurrently` | développement | Lancer backend et frontend avec une seule commande |
+| `concurrently` | développement | Lancer backend et frontend avec une seule commande dans le dossier racine |
 
 ```bash
 npm install --save-dev concurrently
@@ -273,7 +280,7 @@ En résumé :
 
 ## Équipe
 
-| Membre | Rôle | GitHub |
-|---|---|---|
-| Anthony | À compléter | [@leika127](https://github.com/leika127) |
-| À compléter | À compléter | À compléter |
+| Membre | GitHub |
+|---|---|
+| Anthony | [@leika127](https://github.com/leika127) |
+| Bernardo | [@Bsnardo](https://github.com/Bsrnardo) |
