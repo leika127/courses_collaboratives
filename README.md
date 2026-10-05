@@ -29,22 +29,19 @@ Les familles doivent gérer les courses tout en gérant le budjet qui leur est a
 
 ### Cible prioritaire
 
-cette appli ciblera les familles mais principalement la personne du foyer qui fera les courses (le parent)
+cette appli ciblera les familles mais principalement la personne du foyer qui fera les courses (les parents / colocataires)
+
 
 ### Périmètre de la V1
 
 | Dans la V1 | Hors V1 (plus tard) |
 |---|---|
-|Création de liste de courses par catégories et sous-catégories | vérification de liste |
-|Possibilité de fixer un budjet | l'ajout de personnes via l'utilisateur principal |
-|L'ajout de courses se fait en direct par chaque personne du foyer | gestions des droits pour chaque user |
-|La fonction de connexion | le suivi du budjet
-|Suppression des doublons d'achat ajoutés par erreur | mettre une alerte en cas d'ajout sur la liste par les enfants |
-|---| alarme pour rappeler la liste (logo de rappel) |
-|---| alarme lors de l'ajout de courses |
-|---| possibilité suivre 2 achats de courses pour comparer |
-|---| transformer l'application web en application mobile pure |
----
+| Création de liste de courses par catégories et sous-catégories | Ajout de personnes via l'utilisateur principal |
+| Possibilité de fixer un budget et d'en suivre la consommation | Gestion des droits pour chaque utilisateur |
+| Ajout de courses en direct par chaque personne du foyer | Alerte en cas d'ajout sur la liste par les utilisateurs |
+| Fonction de connexion | Comparaison de courses : suivi de 2 achats (statistiques / historique) |
+| Suppression des doublons et vérification de la liste (avec validation) | Alarme pour rappeler la liste (logo de rappel) |
+| | Application web compatible smartphone (hors connexion), puis application mobile pure |
 
 ## Stack technique
 
@@ -284,3 +281,4 @@ En résumé :
 |---|---|
 | Anthony | [@leika127](https://github.com/leika127) |
 | Bernardo | [@Bsnardo](https://github.com/Bsrnardo) |
+| Aurelie | [@aurelieichelmann](https://github.com/aurelieichelmann) |
