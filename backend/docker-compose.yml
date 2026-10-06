@@ -4,11 +4,11 @@ services:
     container_name: courses_collaboratives_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: famille
+      POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: courses_collaboratives
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
       # Ces scripts ne s'exécutent automatiquement que si le volume est vide
