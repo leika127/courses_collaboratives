@@ -1,0 +1,4 @@
+CREATE TABLE categorie (
+  id SERIAL PRIMARY KEY,
+  libelle VARCHAR(255) NOT NULL UNIQUE
+);
