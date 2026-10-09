@@ -1,0 +1,19 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API courses collaboratives",
+    "version": "1.0.0",
+    "description": "API de gestion decourses"
+  },
+  "servers": [{ "url": "/api" }],
+  "paths": {
+    "/categories": {
+      "get": {
+        "summary": "Liste toutes les catégories",
+        "responses": {
+          "200": { "description": "La liste des catégories (id et libelle)" }
+        }
+      }
+    }
+  }
+}
