@@ -18,4 +18,5 @@ VALUES ('Fruits et légumes'),
   ('Produits d''hygiène et de soins'),
   ('Produits d''entretien'),
   ('Produits pour animaux'),
-  ('Maison et divers') ('Autres');
+  ('Maison et divers'),
+  ('Autres');
