@@ -52,7 +52,7 @@ cette appli ciblera les familles mais principalement la personne du foyer qui fe
 | Base de données | PostgreSQL 16 (via Docker) |
 | Qualité du code | ESLint |
 
-Le choix de cette stack est justifié dans les ADR : voir le dossier `docs/adr/` *(à venir)*.
+Le choix de cette stack est justifié dans les ADR : voir le dossier `docs/adr/`.
 
 ---
 
@@ -85,9 +85,10 @@ Le projet contient **trois** `package.json` (racine, backend, frontend). Il faut
 
 ```bash
 npm install
-cd backend && npm install && cd ..
+cd backend && npm install && npm install swagger-ui-express && cd ..
 cd frontend && npm install && cd ..
 ```
+⚠️ La commande npm install swagger-ui-express est indispensable pour éviter un plantage au lancement de npm run dev.
 
 ### 3. Configurer les variables d'environnement
 
@@ -228,23 +229,36 @@ npm install react-router-dom
 courses_collaboratives/
 ├── backend/
 │   ├── server/
-│   │   ├── routes/          # Routes de l'API
-│   │   ├── db.js            # Connexion à PostgreSQL
-│   │   └── server.js        # Point d'entrée du serveur
-│   ├── requetes/            # Requêtes SQL
-│   ├── docker-compose.yml   # Conteneur PostgreSQL
-│   ├── .env.exemple         # Modèle des variables d'environnement
+│   │   ├── routes/             # Routes de l'API
+│   │   ├── db.js               # Connexion à PostgreSQL
+│   │   └── server.js           # Point d'entrée du serveur
+│   ├── docker-compose.yml      # Conteneur PostgreSQL
+│   ├── .env.exemple            # Modèle des variables d'environnement
+│   ├── swagger.json            # Documentation de l'API (Swagger)
 │   └── package.json
+├── docs/
+│   └── adr/                    # Décisions d'architecture (ADR)
+│       ├── 0001-choix-du-workflow-git.md
+│       └── 0002-conventional_comments.md
 ├── frontend/
-│   ├── public/
-│   ├── src/                 # Code React
+│   ├── public/                 # Fichiers statiques (favicon, icônes)
+│   ├── src/                    # Code React
+│   │   ├── assets/             # Images
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── index.html
+│   ├── vite.config.js
+│   ├── eslint.config.js
 │   └── package.json
 ├── sql/
-│   ├── migration_up.sql     # Création des tables
-│   ├── migration_down.sql   # Suppression des tables
-│   └── seed.sql             # Données de test
+│   ├── migration_up.sql        # Création des tables
+│   ├── migration_down.sql      # Suppression des tables
+│   └── seed.sql                # Données de test
 ├── .gitignore
-├── package.json             # Scripts globaux (concurrently)
+├── eslint.config.mjs           # Configuration ESLint (racine)
+├── package.json                # Scripts globaux (concurrently)
 └── README.md
 ```
 
@@ -263,7 +277,7 @@ courses_collaboratives/
 
 ## Contribuer
 
-Les règles complètes sont dans [`CONTRIBUTING.md`](CONTRIBUTING.md) *(à venir)*.
+Les règles complètes sont dans le fichier **docs** qui se trouve à la racine du dossier
 
 En résumé :
 
