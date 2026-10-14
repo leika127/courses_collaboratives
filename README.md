@@ -239,7 +239,8 @@ courses_collaboratives/
 ├── docs/
 │   └── adr/                    # Décisions d'architecture (ADR)
 │       ├── 0001-choix-du-workflow-git.md
-│       └── 0002-conventional_comments.md
+│       ├── 0002-conventional_comments.md
+│       └── 003-nommage-branches.md
 ├── frontend/
 │   ├── public/                 # Fichiers statiques (favicon, icônes)
 │   ├── src/                    # Code React
