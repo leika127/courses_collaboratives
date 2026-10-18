@@ -1,13 +1,35 @@
 import { useState } from 'react';
 
 const RegisterForm = () => {
+  // 1. Les states : une valeur par champ
   const [familyName, setFamilyName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  // 2. Les fonctions : AVANT le return
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const response = await fetch('http://localhost:3000/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        familyName: familyName,
+        firstName: firstName,
+        email: email,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(response.status, data);
+    return;
+  };
+
+  // 3. Le JSX : toujours en dernier
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <h1>Créer le compte de ma famille</h1>
 
       <label>
