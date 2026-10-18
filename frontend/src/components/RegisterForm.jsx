@@ -12,28 +12,34 @@ const RegisterForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await fetch('http://localhost:3000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        familyName: familyName,
-        firstName: firstName,
-        email: email,
-        password: password,
-      }),
-    });
+    try {
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          familyName: familyName,
+          firstName: firstName,
+          email: email,
+          password: password,
+        }),
+      });
 
-    const data = await response.json();
-    if (response.status === 201) {
-      setMessage(
-        `Compte créé ! Bienvenue dans la famille ${data.family.name}.`,
-      );
-      setFamilyName('');
-      setFirstName('');
-      setEmail('');
-      setPassword('');
-    } else {
-      setMessage(data.error || 'Erreur serveur');
+      const data = await response.json();
+
+      if (response.status === 201) {
+        setMessage(
+          `Compte créé ! Bienvenue dans la famille ${data.family.name}.`,
+        );
+        setFamilyName('');
+        setFirstName('');
+        setEmail('');
+        setPassword('');
+      } else {
+        setMessage(data.error || 'Erreur serveur');
+      }
+    } catch (error) {
+      console.error(error);
+      setMessage('Impossible de contacter le serveur. Réessayez plus tard.');
     }
     return;
   };
@@ -43,6 +49,7 @@ const RegisterForm = () => {
     <form onSubmit={handleSubmit}>
       <h1>Créer le compte de ma famille</h1>
       {message !== '' && <p role="status">{message}</p>}
+
       <label>
         Nom de la famille
         <input
