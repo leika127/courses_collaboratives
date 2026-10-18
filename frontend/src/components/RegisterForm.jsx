@@ -6,6 +6,7 @@ const RegisterForm = () => {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
 
   // 2. Les fonctions : AVANT le return
   const handleSubmit = async (event) => {
@@ -23,7 +24,17 @@ const RegisterForm = () => {
     });
 
     const data = await response.json();
-    console.log(response.status, data);
+    if (response.status === 201) {
+      setMessage(
+        `Compte créé ! Bienvenue dans la famille ${data.family.name}.`,
+      );
+      setFamilyName('');
+      setFirstName('');
+      setEmail('');
+      setPassword('');
+    } else {
+      setMessage(data.error || 'Erreur serveur');
+    }
     return;
   };
 
@@ -31,7 +42,7 @@ const RegisterForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       <h1>Créer le compte de ma famille</h1>
-
+      {message !== '' && <p role="status">{message}</p>}
       <label>
         Nom de la famille
         <input
