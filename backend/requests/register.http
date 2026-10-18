@@ -1,0 +1,31 @@
+### Inscription valide (attendu : 201)
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "familyName": "Martin",
+  "firstName": "Sophie",
+  "email": "sophie@exemple.fr",
+  "password": "motdepasse1"
+}
+
+### Email déjà utilisé (attendu : 409)
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "familyName": "Martin",
+  "firstName": "Sophie",
+  "email": "sophie@exemple.fr",
+  "password": "motdepasse1"
+}
+
+### Champ manquant (attendu : 400)
+POST http://localhost:3000/api/register
+Content-Type: application/json
+
+{
+  "familyName": "Martin",
+  "firstName": "Sophie",
+  "password": "motdepasse1"
+}
