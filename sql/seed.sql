@@ -18,4 +18,4 @@ VALUES ('Fruits et légumes'),
   ('Produits d''entretien'),
   ('Produits pour animaux'),
   ('Maison et divers'),
-  ('Autre');
+  ('Autres');
