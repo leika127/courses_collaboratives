@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:16
+    image: postgres:18
     container_name: courses_collaboratives_db
     restart: unless-stopped
     environment:
@@ -10,7 +10,7 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
       # Ces scripts ne s'exécutent automatiquement que si le volume est vide
       # (première initialisation du conteneur).
       - ../sql/migration_up.sql:/docker-entrypoint-initdb.d/01_migration_up.sql:ro
