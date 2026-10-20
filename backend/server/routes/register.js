@@ -13,10 +13,13 @@ registerRouter.post('/', async (req, res) => {
     return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
   }
 
-  // 2. Hacher le mot de passe
+  // 2. Nettoyer l'email : sans espaces autour, en minuscules
+  const normalizedEmail = email.trim().toLowerCase();
+
+  // 3. Hacher le mot de passe (on ne stocke jamais le mot de passe en clair)
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // 3. Créer la famille puis l'organisateur, dans une transaction
+  // 4. Créer la famille puis l'organisateur, dans une transaction
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -27,11 +30,12 @@ registerRouter.post('/', async (req, res) => {
     );
     const family = familyResult.rows[0];
 
+    // La COLONNE s'appelle password_hash : on y range le hash, pas le mot de passe
     const userResult = await client.query(
-      `INSERT INTO users (first_name, email, password, role, family_id)
+      `INSERT INTO users (first_name, email, password_hash, role, family_id)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING id, first_name, email, role`,
-      [firstName, email, hashedPassword, 'organizer', family.id],
+      [firstName, normalizedEmail, hashedPassword, 'organizer', family.id],
     );
     const user = userResult.rows[0];
 
