@@ -22,6 +22,11 @@ CREATE TYPE categorie_types as ENUM (
   'Autre' 
 );
 
+CREATE TYPE role_types as ENUM (
+    'Membres',
+    'Organisateur'
+);  
+
 CREATE TABLE IF NOT EXISTS Family (
 id SERIAL PRIMARY KEY,
 name varchar(100) NOT NULL check (length(trim(name)) > 0),

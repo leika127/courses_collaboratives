@@ -7,3 +7,4 @@ DROP TABLE IF EXISTS category;
 DROP TABLE IF EXISTS user_app;
 DROP TABLE IF EXISTS family;
 DROP TYPE IF EXISTS categorie_types;
+DROP TYPE IF EXISTS role_types;
