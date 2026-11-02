@@ -1,4 +1,5 @@
 -- Active: 1792404991495@@127.0.0.1@5432@courses_collaboratives
+
 CREATE TYPE categorie_types as ENUM (
   'Fruits et legumes',
   'Boucherie et volaille',
@@ -71,9 +72,19 @@ CREATE TABLE IF NOT EXISTS List (
 id SERIAL PRIMARY KEY,
 name varchar(100) NOT NULL check (length(trim(name)) > 0),
 date_created TIMESTAMP NOT NULL,
-quantity int NOT NULL,
 family_id INT,
 FOREIGN KEY (family_id) REFERENCES Family(id)
+);
+
+CREATE TABLE IF NOT EXISTS List_item (
+id SERIAL PRIMARY KEY,
+list_id INT NOT NULL,
+item_id INT NOT NULL,
+quantity INT NOT NULL DEFAULT 1,
+is_checked BOOLEAN NOT NULL DEFAULT FALSE,
+FOREIGN KEY (list_id) REFERENCES List(id) ON DELETE CASCADE,
+FOREIGN KEY (item_id) REFERENCES Item(id),
+UNIQUE (list_id, item_id)
 );
 
 CREATE TABLE IF NOT EXISTS Choice (
