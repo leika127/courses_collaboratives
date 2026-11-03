@@ -1,17 +1,31 @@
+import 'dotenv/config';
 import express from 'express';
-// import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
-// import { readFileSync } from 'fs';
-// import { categorieRouter } from './routes/categories.js';
-
+import cookieParser from 'cookie-parser';
+// import swaggerUi from 'swagger-ui-express';
 
 const app = express();
-app.use(cors());
+const PORT = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-    res.send("Ok, la connexion est établie !")
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  }),
+);
+app.use(express.json());
+app.use(cookieParser());
+// app.use(swaggerUi.serve, swaggerUi.setup());
+
+app.get('/', (req, res) => {
+  return res.send('Ok, la connexion est établie !');
 });
 
-app.listen(3000, () => {
-    console.log("Fonctionne sur le port 3000");
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error(`Impossible de démarrer le serveur : ${error.message}`);
+    return;
+  }
+  console.log(`Fonctionne sur le port ${PORT}`);
+  return;
 });
