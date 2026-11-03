@@ -1,105 +1,79 @@
 -- Active: 1792404991495@@127.0.0.1@5432@courses_collaboratives
+-- =====================================================================
+-- migration_up.sql (Version FUSIONNÉE & COMPATIBLE)
+-- =====================================================================
 
-CREATE TYPE categorie_types as ENUM (
-  'Fruits et legumes',
-  'Boucherie et volaille',
-  'Charcuterie traiteur',
-  'Poissonnerie',
-  'Cremerie et oeufs',
-  'Fromagerie',
-  'Boulangerie - patisserie',
-  'Produits surgeles',
-  'Epicerie',
-  'Petit déjeuner',
-  'Boissons',
-  'Produits bio',
-  'Confiserie',
-  'Produits pour les enfants et bebes',
-  'Produits de beaute',
-  'Produits hygiene et de soins',
-  'Produits entretien',
-  'Produits pour animaux',
-  'Maison et divers',
-  'Autre' 
-);
-
-CREATE TYPE role_types as ENUM (
-    'Membres',
-    'Organisateur'
-);  
-
-CREATE TABLE IF NOT EXISTS Family (
-id SERIAL PRIMARY KEY,
-name varchar(100) NOT NULL check (length(trim(name)) > 0),
-date_created TIMESTAMP NOT NULL,
-budget DECIMAL(10,2)
-);
-
-CREATE TABLE IF NOT EXISTS User_app (
-id SERIAL PRIMARY KEY,
-name varchar(100) NOT NULL check (length(trim(name)) > 0),
-email varchar(100) NOT NULL,
-password_hash varchar(255) NOT NULL,
-role varchar(100),
-date_created TIMESTAMP NOT NULL,
-family_id INT,
-FOREIGN KEY (family_id) REFERENCES Family(id)
-);
-
-CREATE TABLE IF NOT EXISTS Alert (
-id SERIAL PRIMARY KEY,
-message TEXT,
-user_app_id INT,
-FOREIGN KEY (user_app_id) REFERENCES User_app(id)
-);
-
+-- ---------- Catégories ----------
 CREATE TABLE IF NOT EXISTS Category (
-id SERIAL PRIMARY KEY,
-categorie_types categorie_types,
-name varchar(100) NOT NULL check (length(trim(name)) > 0),
-type varchar(100)
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE CHECK (length(trim(name)) > 0)
 );
 
+-- ---------- Familles ----------
+CREATE TABLE IF NOT EXISTS Family (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  budget DECIMAL(10, 2),
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- ---------- Utilisateurs (On garde User_app et name pour le code existant !) ----------
+CREATE TABLE IF NOT EXISTS User_app (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  email VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('organizer', 'member')),
+  family_id INT REFERENCES Family(id) ON DELETE RESTRICT,
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Sécurité Email unique (insensible à la casse)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_app_email_lower ON User_app (LOWER(email));
+
+-- ---------- Articles ----------
 CREATE TABLE IF NOT EXISTS Item (
-id SERIAL PRIMARY KEY,
-name varchar(100) NOT NULL check (length(trim(name)) > 0),
-price DECIMAL(10,2),
-category_id INT,
-FOREIGN KEY (category_id) REFERENCES Category(id)
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  price DECIMAL(10, 2),
+  category_id INT REFERENCES Category(id) ON DELETE SET NULL
 );
 
+-- ---------- Listes ----------
 CREATE TABLE IF NOT EXISTS List (
-id SERIAL PRIMARY KEY,
-name varchar(100) NOT NULL check (length(trim(name)) > 0),
-date_created TIMESTAMP NOT NULL,
-family_id INT,
-FOREIGN KEY (family_id) REFERENCES Family(id)
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  family_id INT REFERENCES Family(id) ON DELETE CASCADE
 );
 
+-- ---------- Articles d'une liste ----------
 CREATE TABLE IF NOT EXISTS List_item (
-id SERIAL PRIMARY KEY,
-list_id INT NOT NULL,
-item_id INT NOT NULL,
-quantity INT NOT NULL DEFAULT 1,
-is_checked BOOLEAN NOT NULL DEFAULT FALSE,
-FOREIGN KEY (list_id) REFERENCES List(id) ON DELETE CASCADE,
-FOREIGN KEY (item_id) REFERENCES Item(id),
-UNIQUE (list_id, item_id)
+  id SERIAL PRIMARY KEY,
+  list_id INT NOT NULL REFERENCES List(id) ON DELETE CASCADE,
+  item_id INT NOT NULL REFERENCES Item(id) ON DELETE CASCADE,
+  quantity INT NOT NULL DEFAULT 1,
+  is_checked BOOLEAN NOT NULL DEFAULT FALSE,
+  UNIQUE (list_id, item_id)
+);
+
+-- ---------- Alertes, choix, invitations ----------
+CREATE TABLE IF NOT EXISTS Alert (
+  id SERIAL PRIMARY KEY,
+  message TEXT,
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Choice (
-purchase_date TIMESTAMP NOT NULL,
-user_app_id INT,
-item_id INT,
-FOREIGN KEY (user_app_id) REFERENCES User_app(id),
-FOREIGN KEY (item_id) REFERENCES Item(id)
+  id SERIAL PRIMARY KEY,
+  purchase_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE,
+  item_id INT REFERENCES Item(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Invite (
-id SERIAL PRIMARY KEY,
-date_created TIMESTAMP NOT NULL,
-family_id INT,
-user_app_id INT,
-FOREIGN KEY (family_id) REFERENCES Family(id),
-FOREIGN KEY (user_app_id) REFERENCES User_app(id)
+  id SERIAL PRIMARY KEY,
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  family_id INT REFERENCES Family(id) ON DELETE CASCADE,
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE
 );
