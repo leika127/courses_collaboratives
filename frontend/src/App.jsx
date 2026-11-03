@@ -1,29 +1,20 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import { connexion } from './api/client'
-
+import { Routes, Route } from 'react-router-dom'
+import Accueil from './components/Accueil'
+import ListeCourses from './components/Listecourse'
+import Navbarre from "./components/Navbarre";
 
 function App() {
-const[message, setMessage] = useState("")
-
-useEffect(() => {
-  const testConnexion = async() =>{
-    try {
-      const resultat = await connexion()
-      setMessage(resultat)
-    } catch (error) {
-      console.error(error)
-      setMessage("Aîe, erreur de connexion server")
-    }
-  }
-  testConnexion()
-}, [])
-
-return(
-  <main>
-    <h1>{message}</h1>
-  </main>
-)
+  return (
+    <div className="app">
+      <main className="page">
+        <Routes>
+          <Route path="/" element={<Accueil prenom="Camille" />} />
+          <Route path="/liste" element={<ListeCourses />} />
+        </Routes>
+      </main>
+      <Navbarre />
+    </div>
+  )
 }
 
-export default App;
+export default App
