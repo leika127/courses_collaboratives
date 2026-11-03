@@ -6,3 +6,5 @@ export const listesRouter = Router();
 
 // Une URL -> un controller (avec middleware optionnel)
 listesRouter.get('/:id/articles', listeController.getArticles);
+listesRouter.patch('/:id/articles/:articleId', listeController.updateArticle);
+listesRouter.delete('/:id/articles/:articleId', listeController.deleteArticle);

@@ -1,53 +1,27 @@
 import { useState, useEffect } from 'react'
-
-const API_URL_LISTE = 'http://localhost:3000/api/listes/1/articles'
+import { useListe } from '../ListeContext'
 
 function ListeCourses() {
-  const [course, setCourse] = useState([])
-  const [selectStatus, setSelectStatus] = useState('all')
-  const [erreurApi, setErreurApi] = useState(null)
+  const { articles: course, erreurApi, modifierArticle, supprimerArticle, ajouterArticle } = useListe()
+  const [recherche, setRecherche] = useState('')
+  const [catalogue, setCatalogue] = useState([])
 
-  // Charger la liste depuis l'API
+  // Charger le catalogue d'articles pour la recherche
   useEffect(() => {
-    const chargerListe = async () => {
-      try {
-        const reponse = await fetch(API_URL_LISTE)
-        if (!reponse.ok) throw new Error('Erreur chargement liste')
-        const data = await reponse.json()
-        setCourse(data.map((item) => ({ ...item, achete: Boolean(item.achete) })))
-      } catch (error) {
-        console.log('❌ Erreur :', error.message)
-        setErreurApi(error.message)
-      }
-    }
-    chargerListe()
+    fetch('http://localhost:3000/api/items')
+      .then((res) => res.json())
+      .then((data) => setCatalogue(data))
+      .catch((err) => console.log('Erreur chargement catalogue', err))
   }, [])
 
-  const toggleArticle = (id) => {
-    setCourse((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, achete: !item.achete } : item))
-    )
-  }
-
-  const modifierQuantite = (id, delta) => {
-    setCourse((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, (item.quantity || 1) + delta) }
-          : item
-      )
-    )
-  }
-
-  // US 07 : suppression d'un article
-  const supprimerArticle = (id) => {
-    setCourse((prev) => prev.filter((item) => item.id !== id))
-  }
-
-  const courseFiltrees = course.filter((item) => {
-    if (selectStatus === 'achete') return item.achete
-    if (selectStatus === 'a_acheter') return !item.achete
-    return true
+  // Filtrer le catalogue selon ce que l'on tape (et exclure ce qui est déjà dans la liste)
+  const catalogueFiltre = recherche.trim() === '' ? [] : catalogue.filter((item) => {
+    const nomArticle = item.nom || item.name || ''
+    const dejaDansLaListe = course.some((c) => {
+      const nomCourse = c.nom || c.name || ''
+      return nomCourse.toLowerCase() === nomArticle.toLowerCase()
+    })
+    return nomArticle.toLowerCase().includes(recherche.toLowerCase()) && !dejaDansLaListe
   })
 
   return (
@@ -60,37 +34,86 @@ function ListeCourses() {
         </div>
       )}
 
-      <section className="carte champ">
-        <label htmlFor="filtre">Afficher</label>
-        <select
-          id="filtre"
-          value={selectStatus}
-          onChange={(e) => setSelectStatus(e.target.value)}
-        >
-          <option value="all">Tous les articles</option>
-          <option value="a_acheter">À acheter</option>
-          <option value="achete">Déjà pris</option>
-        </select>
+      {/* Barre de recherche et suggestions du catalogue */}
+      <section className="carte champ" style={{ position: 'relative' }}>
+        <label htmlFor="recherche">Ajouter un article</label>
+        <input
+          id="recherche"
+          type="text"
+          placeholder="Rechercher dans les rayons..."
+          value={recherche}
+          onChange={(e) => setRecherche(e.target.value)}
+        />
+
+        {catalogueFiltre.length > 0 && (
+          <ul className="suggestions-liste" style={{ 
+            listStyle: 'none', 
+            padding: '0', 
+            marginTop: '8px',
+            background: '#fff',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            maxHeight: '180px',
+            overflowY: 'auto',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          }}>
+            {catalogueFiltre.map((item) => (
+              <li 
+                key={item.id} 
+                onClick={() => {
+                  if (ajouterArticle) {
+                    ajouterArticle(item)
+                  }
+                  setRecherche('')
+                }}
+                style={{ 
+                  padding: '10px 12px', 
+                  cursor: 'pointer', 
+                  borderBottom: '1px solid #eee', 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
+              >
+                <span>{item.nom || item.name}</span>
+                <span style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
+      {/* Liste complète des courses */}
       <section className="carte">
-        {courseFiltrees.length === 0 ? (
+        {course.length === 0 ? (
           <p className="texte-gris">Aucun article dans la liste.</p>
         ) : (
-          courseFiltrees.map((item) => (
+          course.map((item) => (
             <div key={item.id} className={`ligne-article ${item.achete ? 'pris' : ''}`}>
               <input
                 id={`article-${item.id}`}
                 type="checkbox"
                 checked={item.achete}
-                onChange={() => toggleArticle(item.id)}
+                onChange={() => modifierArticle(item.id, { achete: !item.achete })}
               />
-              <label htmlFor={`article-${item.id}`}>{item.nom}</label>
+              <label htmlFor={`article-${item.id}`}>{item.nom || item.name}</label>
 
               <div className="quantite-selecteur">
-                <button type="button" onClick={() => modifierQuantite(item.id, -1)} className="btn-quantite">−</button>
+                <button 
+                  type="button" 
+                  onClick={() => modifierArticle(item.id, { quantity: Math.max(1, (item.quantity || 1) - 1) })} 
+                  className="btn-quantite"
+                >
+                  −
+                </button>
                 <span className="badge">x{item.quantity || 1}</span>
-                <button type="button" onClick={() => modifierQuantite(item.id, 1)} className="btn-quantite">+</button>
+                <button 
+                  type="button" 
+                  onClick={() => modifierArticle(item.id, { quantity: (item.quantity || 1) + 1 })} 
+                  className="btn-quantite"
+                >
+                  +
+                </button>
               </div>
 
               <button
