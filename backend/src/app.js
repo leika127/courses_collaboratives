@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { errorHandler } from './middlewares/errorHandler.js';
 // import swaggerUi from 'swagger-ui-express';
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
@@ -23,3 +24,4 @@ app.get('/', (req, res) => {
 
 // Plus tard ici : app.use('/api/auth', authRouter);
 // Et en tout dernier : app.use(errorHandler);
+app.use(errorHandler); // Transforme TOUTES les erreurs en réponses HTTP, à un seul endroit
