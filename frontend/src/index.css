@@ -363,3 +363,43 @@ details.rayon[open] summary::after {
   transform: scale(0.92);
   background: var(--bordure);
 }
+
+.entete {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.titre-ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.progression-texte {
+  margin: 12px 0 6px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.barre {
+  height: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  background: var(--ligne);
+}
+
+.barre-remplie {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--vert);
+}
+
+.nom-article {
+  flex: 1;
+}
+
+.carte .bouton {
+  margin-top: 12px;
+}
