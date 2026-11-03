@@ -19,5 +19,25 @@ export const listeModel = {
       [listId]
     );
     return rows;
+  },
+
+  async modifierArticle(listId, articleId, { achete, quantity }) {
+    const { rows } = await pool.query(
+      `UPDATE List_item
+       SET is_checked = COALESCE($1, is_checked),
+           quantity   = COALESCE($2, quantity)
+       WHERE id = $3 AND list_id = $4
+       RETURNING id, is_checked AS achete, quantity`,
+      [achete ?? null, quantity ?? null, articleId, listId]
+    );
+    return rows[0] ?? null;
+  },
+
+  async supprimerArticle(listId, articleId) {
+    const { rowCount } = await pool.query(
+      'DELETE FROM List_item WHERE id = $1 AND list_id = $2',
+      [articleId, listId]
+    );
+    return rowCount > 0;
   }
 };
