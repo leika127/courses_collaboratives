@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { authRouter } from './routes/auth.routes.js';
 // import swaggerUi from 'swagger-ui-express';
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
@@ -22,6 +23,6 @@ app.get('/', (req, res) => {
   return res.send('Ok, la connexion est établie !');
 });
 
-// Plus tard ici : app.use('/api/auth', authRouter);
+app.use('/api/auth', authRouter);
 // Et en tout dernier : app.use(errorHandler);
 app.use(errorHandler); // Transforme TOUTES les erreurs en réponses HTTP, à un seul endroit
