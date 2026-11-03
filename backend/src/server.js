@@ -1,25 +1,17 @@
 import 'dotenv/config';
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-// import swaggerUi from 'swagger-ui-express';
+import { app } from './app.js';
 
-const app = express();
+// server.js : DÉMARRE l'application définie dans app.js
+
+// Sans clé secrète, impossible de signer les tokens : on refuse de démarrer
+if (!process.env.JWT_SECRET) {
+  console.error(
+    'JWT_SECRET manquant : copie .env.exemple en .env et remplis-le',
+  );
+  process.exit(1);
+}
+
 const PORT = process.env.PORT || 3000;
-
-app.use(
-  cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-  }),
-);
-app.use(express.json());
-app.use(cookieParser());
-// app.use(swaggerUi.serve, swaggerUi.setup());
-
-app.get('/', (req, res) => {
-  return res.send('Ok, la connexion est établie !');
-});
 
 app.listen(PORT, (error) => {
   if (error) {
