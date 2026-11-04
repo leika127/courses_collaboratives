@@ -1,18 +1,30 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
+/* ==========================================================
+   Variables : palette « Brume », bouton bleu ciel
+   ========================================================== */
 :root {
-  --vert: #1f7a4d;
-  --vert-fonce: #17603b;
-  --vert-clair: #e1f0e7;
-  --encre: #14201a;
-  --gris: #5b6b62;
-  --fond: #f3f6f1;
-  --blanc: #ffffff;
-  --bordure: #c4d2c8;
-  --ligne: #e6ede8;
-  --jaune: #fbe7b5;
-  --jaune-texte: #4a3500;
+  --fond: #ffffff;
+  --encre: #111111;
+  --gris: #6b6b6b;
+  --filet: #e5e5e5;
+
+  /* tuiles par rayon */
+  --tuile-1: #d4e4f7;
+  --tuile-2: #dfd8f4;
+  --tuile-3: #f6dbe6;
+  --tuile-4: #efe6d6;
+
+  /* bouton principal : bleu ciel, texte noir dessus */
+  --accent: #a9c8f2;
+  --sur-accent: #111111;
+  --accent-soutenu: #5f8fd8; /* barre de progression (meilleur contraste) */
+
+  --alerte-fond: #efe6d6;
+  --alerte-texte: #3a2f1c;
+
   --rayon: 16px;
+  --pilule: 999px;
 }
 
 * {
@@ -23,27 +35,33 @@ body {
   margin: 0;
   background: var(--fond);
   color: var(--encre);
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 18px;
 }
 
+/* ==========================================================
+   Typographie
+   ========================================================== */
 h1,
 h2 {
   margin: 0;
-  font-family: 'Bricolage Grotesque', sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 h1 {
-  font-size: 30px;
+  font-size: 36px;
+  line-height: 1;
 }
 
 h2 {
-  font-size: 20px;
+  font-size: 22px;
+  line-height: 1.15;
 }
 
 a {
-  color: var(--vert-fonce);
+  color: var(--encre);
 }
 
 a:focus-visible,
@@ -55,6 +73,14 @@ summary:focus-visible {
   outline-offset: 2px;
 }
 
+.texte-gris {
+  color: var(--gris);
+  font-size: 16px;
+}
+
+/* ==========================================================
+   Structure
+   ========================================================== */
 .app {
   max-width: 480px;
   min-height: 100vh;
@@ -68,51 +94,124 @@ summary:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 24px 20px 90px;
+  padding: 28px 20px 90px;
 }
 
-.texte-gris {
-  color: var(--gris);
+.entete {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.titre-ligne {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ==========================================================
+   Accueil : tuiles par rayon
+   ========================================================== */
+.grille-rayons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.tuile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 132px;
+  padding: 14px;
+  border-radius: 20px;
+  background: var(--tuile-1);
+  color: var(--encre);
+  text-decoration: none;
+}
+
+.tuile-1 { background: var(--tuile-1); }
+.tuile-2 { background: var(--tuile-2); }
+.tuile-3 { background: var(--tuile-3); }
+.tuile-4 { background: var(--tuile-4); }
+
+.tuile-numero {
+  font-size: 14px;
+  color: #3d3d3d;
+}
+
+.tuile strong {
+  display: block;
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.tuile-nom {
   font-size: 16px;
+  font-weight: 500;
 }
 
+/* ==========================================================
+   Cartes
+   ========================================================== */
 .carte {
-  background: var(--blanc);
+  background: var(--fond);
+  border: 1px solid var(--filet);
   border-radius: 20px;
   padding: 16px 18px;
-  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.06);
 }
 
+.carte .bouton {
+  margin-top: 12px;
+}
+
+/* ==========================================================
+   Boutons
+   ========================================================== */
 .bouton {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 56px;
-  padding: 0 20px;
+  padding: 0 24px;
   border: none;
-  border-radius: var(--rayon);
-  background: var(--vert);
-  color: var(--blanc);
+  border-radius: var(--pilule);
+  background: var(--accent);
+  color: var(--sur-accent);
   font-family: inherit;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
 }
 
+.bouton:active {
+  background: var(--accent-soutenu);
+}
+
 .bouton-secondaire {
   background: transparent;
-  color: var(--vert-fonce);
-  border: 2px solid var(--vert);
+  color: var(--encre);
+  border: 2px solid var(--encre);
+}
+
+.bouton-secondaire:active {
+  background: var(--tuile-1);
 }
 
 .bouton-discret {
   min-height: 52px;
-  background: var(--vert-clair);
-  color: var(--vert-fonce);
+  background: var(--tuile-1);
+  color: var(--encre);
   font-size: 16px;
 }
 
+/* ==========================================================
+   Formulaires
+   ========================================================== */
 .champ {
   display: flex;
   flex-direction: column;
@@ -120,8 +219,8 @@ summary:focus-visible {
 }
 
 .champ label {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 input[type='text'],
@@ -130,10 +229,10 @@ input[type='password'],
 select {
   height: 56px;
   width: 100%;
-  padding: 0 14px;
-  border: 1.5px solid var(--bordure);
+  padding: 0 16px;
+  border: 1.5px solid #cfcfcf;
   border-radius: 14px;
-  background: var(--blanc);
+  background: var(--fond);
   color: var(--encre);
   font-family: inherit;
   font-size: 17px;
@@ -144,12 +243,15 @@ select {
   gap: 10px;
 }
 
+/* ==========================================================
+   Liste d'articles : filets fins, pas de cartes
+   ========================================================== */
 .ligne-article {
   display: flex;
   align-items: center;
   gap: 14px;
-  min-height: 56px;
-  border-top: 1px solid var(--ligne);
+  min-height: 60px;
+  border-top: 1px solid var(--filet);
 }
 
 .ligne-article:first-child {
@@ -160,7 +262,7 @@ select {
   width: 28px;
   height: 28px;
   margin: 0;
-  accent-color: var(--vert);
+  accent-color: var(--encre);
 }
 
 .ligne-article label {
@@ -171,35 +273,45 @@ select {
 
 .ligne-article.pris label,
 .ligne-article.pris span {
-  color: var(--gris);
+  color: #9a9a9a;
   text-decoration: line-through;
 }
 
+.nom-article {
+  flex: 1;
+}
+
+/* ==========================================================
+   Badges et alertes
+   ========================================================== */
 .badge {
-  padding: 4px 10px;
-  border-radius: 10px;
-  background: var(--vert-clair);
-  color: var(--vert-fonce);
+  padding: 4px 12px;
+  border-radius: var(--pilule);
+  background: var(--tuile-1);
+  color: var(--encre);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .badge-alerte {
-  background: var(--jaune);
-  color: var(--jaune-texte);
+  background: var(--alerte-fond);
+  color: var(--alerte-texte);
 }
 
 .alerte {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px;
+  padding: 14px 16px;
   border-radius: var(--rayon);
-  background: var(--jaune);
-  color: #3d2b00;
+  background: var(--alerte-fond);
+  color: var(--alerte-texte);
   font-size: 16px;
 }
 
+/* ==========================================================
+   Produits
+   ========================================================== */
 .produit {
   display: flex;
   flex-direction: column;
@@ -216,8 +328,8 @@ select {
   width: 72px;
   height: 72px;
   flex: none;
-  border-radius: 14px;
-  background: #e8efea;
+  border-radius: 16px;
+  background: var(--tuile-1);
 }
 
 .produit-actions {
@@ -231,10 +343,13 @@ select {
   font-size: 15px;
 }
 
+/* ==========================================================
+   Rayons dépliables
+   ========================================================== */
 details.rayon {
-  background: var(--blanc);
+  background: var(--fond);
+  border: 1px solid var(--filet);
   border-radius: 20px;
-  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.06);
 }
 
 details.rayon summary {
@@ -243,7 +358,8 @@ details.rayon summary {
   min-height: 68px;
   padding: 0 18px;
   font-size: 19px;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   list-style: none;
   cursor: pointer;
 }
@@ -269,7 +385,7 @@ details.rayon[open] summary::after {
   display: flex;
   align-items: center;
   min-height: 52px;
-  border-top: 1px solid var(--ligne);
+  border-top: 1px solid var(--filet);
   color: var(--encre);
   font-size: 17px;
   text-decoration: none;
@@ -280,11 +396,73 @@ details.rayon[open] summary::after {
   padding: 0 16px;
   border: none;
   border-radius: 12px;
-  background: var(--vert-clair);
-  color: var(--vert-fonce);
-  font-weight: 600;
+  background: var(--tuile-1);
+  color: var(--encre);
+  font-weight: 700;
 }
 
+/* ==========================================================
+   Progression
+   ========================================================== */
+.progression-texte {
+  margin: 12px 0 6px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--gris);
+}
+
+.barre {
+  height: 10px;
+  margin-bottom: 8px;
+  border-radius: 5px;
+  background: var(--tuile-1);
+}
+
+.barre-remplie {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--accent-soutenu);
+}
+
+/* ==========================================================
+   Sélecteur de quantité
+   ========================================================== */
+.quantite-selecteur {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-quantite,
+.btn-supprimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: var(--tuile-1);
+  color: var(--encre);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-supprimer {
+  font-size: 14px;
+}
+
+.btn-quantite:active,
+.btn-supprimer:active {
+  transform: scale(0.92);
+  background: var(--accent);
+}
+
+/* ==========================================================
+   Navigation du bas
+   ========================================================== */
 .nav-bas {
   position: fixed;
   bottom: 0;
@@ -294,8 +472,8 @@ details.rayon[open] summary::after {
   max-width: 480px;
   display: flex;
   padding: 6px 8px 10px;
-  background: var(--blanc);
-  border-top: 1px solid #dce5de;
+  background: var(--fond);
+  border-top: 1px solid var(--filet);
 }
 
 .nav-bas a {
@@ -307,99 +485,124 @@ details.rayon[open] summary::after {
   min-height: 56px;
   color: var(--gris);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   text-decoration: none;
 }
 
 .nav-bas a.actif {
-  color: var(--vert-fonce);
-  background: var(--vert-clair);
+  color: var(--encre);
+  font-weight: 700;
+  background: var(--tuile-1);
   border-radius: 14px;
 }
-.quantite-selecteur {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-quantite {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: var(--vert-clair);
-  color: var(--vert-fonce);
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.btn-quantite:active {
-  transform: scale(0.92);
-  background: var(--bordure);
-}
-
-.btn-supprimer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 50%;
-  background: var(--vert-clair);
-  color: var(--vert-fonce);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.btn-supprimer:active {
-  transform: scale(0.92);
-  background: var(--bordure);
-}
-
-.entete {
+/* ==========================================================
+   Liste de courses : chaque article dans son cadre
+   ========================================================== */
+.liste-articles {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 10px;
 }
 
-.titre-ligne {
+.liste-articles .ligne-article {
+  min-height: 68px;
+  padding: 8px 12px 8px 16px;
+  border: 1px solid var(--filet);
+  border-radius: 20px;
+  background: var(--fond);
+}
+
+.liste-articles .ligne-article:first-child {
+  border-top: 1px solid var(--filet);
+}
+
+.liste-articles .ligne-article label {
+  padding: 12px 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* article déjà pris : cadre sans fond, texte barré (sauf la quantité) */
+.liste-articles .ligne-article.pris {
+  background: transparent;
+}
+
+.liste-articles .ligne-article.pris .badge {
+  text-decoration: none;
+}
+
+/* quantité : une pilule qui regroupe − x1 + */
+.quantite-selecteur {
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--filet);
+  border-radius: var(--pilule);
+}
+
+.quantite-selecteur .badge {
+  min-width: 34px;
+  padding: 4px 6px;
+  text-align: center;
+  background: transparent;
+  font-weight: 700;
+}
+
+.quantite-selecteur .btn-quantite {
+  width: 30px;
+  height: 30px;
+}
+
+/* supprimer : discret, sans fond */
+.liste-articles .btn-supprimer {
+  background: transparent;
+  color: var(--gris);
+}
+
+.liste-articles .btn-supprimer:active {
+  background: var(--tuile-3);
+  color: var(--encre);
+}
+
+/* ==========================================================
+   Recherche et suggestions (remplace les style={{ ... }})
+   ========================================================== */
+.champ-recherche {
+  position: relative;
+}
+
+.suggestions-liste {
+  position: absolute;
+  z-index: 10;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 8px 0 0;
+  padding: 6px;
+  list-style: none;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--fond);
+  border: 1px solid var(--filet);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.suggestion-item {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: 14px;
+  cursor: pointer;
 }
 
-.progression-texte {
-  margin: 12px 0 6px;
-  font-size: 16px;
-  font-weight: 600;
+.suggestion-item:hover,
+.suggestion-item:active {
+  background: var(--tuile-1);
 }
 
-.barre {
-  height: 10px;
-  margin-bottom: 8px;
-  border-radius: 5px;
-  background: var(--ligne);
-}
-
-.barre-remplie {
-  height: 10px;
-  border-radius: 5px;
-  background: var(--vert);
-}
-
-.nom-article {
-  flex: 1;
-}
-
-.carte .bouton {
-  margin-top: 12px;
+.suggestion-ajout {
+  font-size: 15px;
+  font-weight: 700;
 }
