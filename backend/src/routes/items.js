@@ -1,8 +1,6 @@
 import express from 'express';
 import * as itemController from '../controllers/itemController.js';
 
-const router = express.Router();
+export const itemsRouter = express.Router();
 
-router.get('/items', itemController.getItems);
-
-export default router;
+itemsRouter.get('/', itemController.getItems);
