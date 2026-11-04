@@ -1,33 +1,20 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import { connexion } from './api/client';
-import RegisterForm from './components/RegisterForm.jsx';
+import { Routes, Route } from 'react-router-dom'
+import Accueil from './components/Accueil'
+import ListeCourses from './components/Listecourse'
+import Navbarre from "./components/Navbarre";
 
-const App = () => {
-  const [message, setMessage] = useState('');
-
-  // Au démarrage : on vérifie que le frontend arrive à joindre le serveur
-  useEffect(() => {
-    const testConnexion = async () => {
-      try {
-        const resultat = await connexion();
-        setMessage(resultat);
-      } catch (error) {
-        console.error(error);
-        setMessage('Aïe, erreur de connexion server');
-      }
-      return;
-    };
-    testConnexion();
-    return;
-  }, []);
-
+function App() {
   return (
-    <main>
-      <h1>{message}</h1>
-      <RegisterForm />
-    </main>
-  );
-};
+    <div className="app">
+      <main className="page">
+        <Routes>
+          <Route path="/" element={<Accueil prenom="Camille" />} />
+          <Route path="/liste" element={<ListeCourses />} />
+        </Routes>
+      </main>
+      <Navbarre />
+    </div>
+  )
+}
 
-export default App;
+export default App

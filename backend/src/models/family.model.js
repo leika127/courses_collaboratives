@@ -4,7 +4,7 @@ import { pool } from '../db.js';
 // db : la connexion à utiliser (pool par défaut, ou le client d'une transaction)
 const create = async (name, db = pool) => {
   const { rows } = await db.query(
-    `INSERT INTO families (name)
+    `INSERT INTO Family (name)
      VALUES ($1)
      RETURNING id, name, date_created AS "dateCreated"`,
     [name],
