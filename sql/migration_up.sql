@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS User_app (
   email VARCHAR(255) NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('organizer', 'member')),
-  family_id INT REFERENCES Family(id) ON DELETE RESTRICT,
+  family_id INT NOT NULL REFERENCES Family(id) ON DELETE RESTRICT,
   date_created TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
