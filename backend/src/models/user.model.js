@@ -4,12 +4,12 @@ import { pool } from '../db.js';
 const findByEmail = async (email) => {
   const { rows } = await pool.query(
     `SELECT id,
-            first_name    AS "firstName",
+            name          AS "firstName",
             email,
             password_hash AS "passwordHash",
             role,
             family_id AS "familyId"
-     FROM users
+     FROM User_app
      WHERE lower(email) = lower($1)`,
     [email],
   );
@@ -23,10 +23,10 @@ const create = async (
   db = pool,
 ) => {
   const { rows } = await db.query(
-    `INSERT INTO users (first_name, email, password_hash, role, family_id)
+    `INSERT INTO User_app (name, email, password_hash, role, family_id)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING id,
-               first_name AS "firstName",
+               name AS "firstName",
                email,
                role,
                family_id  AS "familyId"`,

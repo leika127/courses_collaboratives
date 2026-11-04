@@ -1,22 +1,79 @@
-create table categories (
-  id serial primary key,
-  name varchar(255) not null unique
+-- Active: 1792404991495@@127.0.0.1@5432@courses_collaboratives
+-- =====================================================================
+-- migration_up.sql (Version FUSIONNÉE & COMPATIBLE)
+-- =====================================================================
+
+-- ---------- Catégories ----------
+CREATE TABLE IF NOT EXISTS Category (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE CHECK (length(trim(name)) > 0)
 );
-create table families (
-  id serial primary key,
-  name varchar(255) not null check (length(trim(name)) > 0),
-  date_created timestamptz not null default now()
+
+-- ---------- Familles ----------
+CREATE TABLE IF NOT EXISTS Family (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  budget DECIMAL(10, 2),
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-create table users (
-  id serial primary key,
-  first_name varchar(255) not null check (length(trim(first_name)) > 0),
-  password_hash varchar(255) not null,
-  email varchar(255) not null,
-  role varchar(20) not null default 'member' check (role in ('organizer', 'member')),
-  /*La valeur par défaut s’applique seulement quand aucun rôle n'est envoyé. Si une requête envoie explicitement "NULL", la colonne l’accepterait. Avec "not null", ce cas est bloqué.*/
-  family_id int not null references families(id) on delete restrict,
-  /*not null : un utilisateur appartient toujours à une famille.   on delete restrict : impossible de supprimer une famille tant qu'elle a des membres.   Il faut d'abord supprimer ses membres, volontairement. Ce choix évite d'effacer des données par accident. */
-  date_created timestamptz not null default now()
-  /*La date de création est automatiquement définie à la date et l’heure actuelles lors de l’insertion d’un nouvel utilisateur. Cela permet de suivre quand chaque utilisateur a été créé dans le système. */
+
+-- ---------- Utilisateurs (On garde User_app et name pour le code existant !) ----------
+CREATE TABLE IF NOT EXISTS User_app (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  email VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  role VARCHAR(20) NOT NULL DEFAULT 'member' CHECK (role IN ('organizer', 'member')),
+  family_id INT NOT NULL REFERENCES Family(id) ON DELETE RESTRICT,
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-create unique index idx_users_email_lower on users (lower(email));
+
+-- Sécurité Email unique (insensible à la casse)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_user_app_email_lower ON User_app (LOWER(email));
+
+-- ---------- Articles ----------
+CREATE TABLE IF NOT EXISTS Item (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  price DECIMAL(10, 2),
+  category_id INT REFERENCES Category(id) ON DELETE SET NULL
+);
+
+-- ---------- Listes ----------
+CREATE TABLE IF NOT EXISTS List (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL CHECK (length(trim(name)) > 0),
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  family_id INT REFERENCES Family(id) ON DELETE CASCADE
+);
+
+-- ---------- Articles d'une liste ----------
+CREATE TABLE IF NOT EXISTS List_item (
+  id SERIAL PRIMARY KEY,
+  list_id INT NOT NULL REFERENCES List(id) ON DELETE CASCADE,
+  item_id INT NOT NULL REFERENCES Item(id) ON DELETE CASCADE,
+  quantity INT NOT NULL DEFAULT 1,
+  is_checked BOOLEAN NOT NULL DEFAULT FALSE,
+  UNIQUE (list_id, item_id)
+);
+
+-- ---------- Alertes, choix, invitations ----------
+CREATE TABLE IF NOT EXISTS Alert (
+  id SERIAL PRIMARY KEY,
+  message TEXT,
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Choice (
+  id SERIAL PRIMARY KEY,
+  purchase_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE,
+  item_id INT REFERENCES Item(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS Invite (
+  id SERIAL PRIMARY KEY,
+  date_created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  family_id INT REFERENCES Family(id) ON DELETE CASCADE,
+  user_app_id INT REFERENCES User_app(id) ON DELETE CASCADE
+);

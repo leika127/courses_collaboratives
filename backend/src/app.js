@@ -3,6 +3,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/auth.routes.js';
+import { listesRouter } from './routes/listes.js';
+import { itemsRouter } from './routes/items.js';
 // import swaggerUi from 'swagger-ui-express';
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
@@ -23,6 +25,10 @@ app.get('/', (req, res) => {
   return res.send('Ok, la connexion est établie !');
 });
 
+// Branchement des routeurs avec leurs préfixes
 app.use('/api/auth', authRouter);
-// Et en tout dernier : app.use(errorHandler);
-app.use(errorHandler); // Transforme TOUTES les erreurs en réponses HTTP, à un seul endroit
+app.use('/api/listes', listesRouter);
+app.use('/api/items', itemsRouter);
+
+// Toujours en DERNIER : reçoit les erreurs de tout ce qui est au-dessus
+app.use(errorHandler);
