@@ -10,3 +10,10 @@ export const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
 });
+
+// Si PostgreSQL coupe une connexion inactive (redémarrage de Docker…),
+// on l'affiche au lieu de laisser le serveur Node s'arrêter
+pool.on('error', (error) => {
+  console.error(`Connexion PostgreSQL perdue : ${error.message}`);
+  return;
+});
