@@ -39,5 +39,27 @@ export const listeModel = {
       [articleId, listId]
     );
     return rowCount > 0;
+  },
+    async trouverItemParId(id) {
+    const { rows } = await pool.query('SELECT id FROM Item WHERE id = $1', [id]);
+    return rows[0] ?? null;
+  },
+
+  // Ajoute l'article, ou augmente sa quantité s'il est déjà dans la liste
+  async ajouterArticle(listId, itemId, quantity) {
+    const { rows } = await pool.query(
+      `WITH ajout AS (
+         INSERT INTO List_item (list_id, item_id, quantity)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (list_id, item_id)
+         DO UPDATE SET quantity = List_item.quantity + EXCLUDED.quantity
+         RETURNING id, item_id, is_checked, quantity
+       )
+       SELECT a.id, i.name AS nom, a.is_checked AS achete, a.quantity
+       FROM ajout a
+       JOIN Item i ON i.id = a.item_id`,
+      [listId, itemId, quantity]
+    );
+    return rows[0];
   }
 };
