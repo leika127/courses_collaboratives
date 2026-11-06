@@ -68,11 +68,11 @@ export const listeController = {
   async addArticle(req, res) {
     try {
       const listId = Number(req.params.id);
-      if (isNaN(listId)) {
+      if (!isValidId(listId)) {
         return res.status(422).json({ error: "Format d'ID invalide" });
       }
 
-      const { itemId, quantity } = req.body;
+      const { itemId, quantity } = req.body ?? {};
       const article = await listeService.ajouterArticle(listId, { itemId, quantity });
       return res.status(201).json(article);
     } catch (erreur) {
