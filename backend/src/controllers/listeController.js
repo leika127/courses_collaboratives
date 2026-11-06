@@ -5,6 +5,16 @@ const isValidId = (value) => {
   return Number.isInteger(value) && value > 0;
 };
 
+// Répond à une erreur : message métier si elle est prévue (status),
+// sinon on garde le détail technique pour la console et on renvoie un message générique
+const sendError = (res, erreur) => {
+  if (erreur.status) {
+    return res.status(erreur.status).json({ error: erreur.message });
+  }
+  console.error(erreur);
+  return res.status(500).json({ error: 'Erreur serveur' });
+};
+
 export const listeController = {
   async getArticles(req, res) {
     try {
@@ -17,11 +27,7 @@ export const listeController = {
       const articles = await listeService.recupererArticlesDeLaListe(listId);
       return res.status(200).json(articles);
     } catch (erreur) {
-      // Gestion des erreurs métiers renvoyées par le service
-      const status = erreur.status || 500;
-      return res
-        .status(status)
-        .json({ error: erreur.message || 'Erreur serveur' });
+      return sendError(res, erreur);
     }
   },
 
@@ -40,10 +46,7 @@ export const listeController = {
       });
       return res.status(200).json(article);
     } catch (erreur) {
-      const status = erreur.status || 500;
-      return res
-        .status(status)
-        .json({ error: erreur.message || 'Erreur serveur' });
+      return sendError(res, erreur);
     }
   },
 
@@ -58,10 +61,7 @@ export const listeController = {
       await listeService.supprimerArticle(listId, articleId);
       return res.status(204).send();
     } catch (erreur) {
-      const status = erreur.status || 500;
-      return res
-        .status(status)
-        .json({ error: erreur.message || 'Erreur serveur' });
+      return sendError(res, erreur);
     }
   },
 
@@ -76,8 +76,7 @@ export const listeController = {
       const article = await listeService.ajouterArticle(listId, { itemId, quantity });
       return res.status(201).json(article);
     } catch (erreur) {
-      const status = erreur.status || 500;
-      return res.status(status).json({ error: erreur.message || 'Erreur serveur' });
+      return sendError(res, erreur);
     }
   }
 };
