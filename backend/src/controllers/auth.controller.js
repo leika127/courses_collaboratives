@@ -10,7 +10,7 @@ const isFilled = (value) => {
   return typeof value === 'string' && value.trim() !== '';
 };
 
-// POST /api/auth/register  ← FONCTION 1 : inchangée
+// POST /api/auth/register
 const register = async (req, res) => {
   const { familyName, firstName, email, password } = req.body ?? {};
 
@@ -61,4 +61,10 @@ const login = async (req, res) => {
   return res.status(200).json({ user: user });
 };
 
-export const authController = { register, login };
+// GET /api/auth/me (protégée par le middleware auth)
+const me = async (req, res) => {
+  const user = await authService.getProfile(req.utilisateur.id);
+  return res.status(200).json({ user: user });
+};
+
+export const authController = { register, login, me };
