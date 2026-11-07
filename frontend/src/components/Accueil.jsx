@@ -43,7 +43,9 @@ function Accueil({ prenom = 'Camille' }) {
         <Link to="/liste" className="bouton">Voir toute la liste</Link>
       </section>
 
-      <a href="#" className="bouton bouton-secondaire">Choisir dans les rayons</a>
+      <Link to="/rayons" className="bouton bouton-secondaire" style={{ marginTop: 12 }}>
+          Voir tous les rayons
+        </Link>
     </>
   )
 }

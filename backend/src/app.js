@@ -5,6 +5,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/auth.routes.js';
 import { listesRouter } from './routes/listes.js';
 import { itemsRouter } from './routes/items.js';
+import { categoriesRouter } from './routes/categories.js';
 // import swaggerUi from 'swagger-ui-express';
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/listes', listesRouter);
 app.use('/api/items', itemsRouter);
+app.use('/api/categories', categoriesRouter);
 
 // Toujours en DERNIER : reçoit les erreurs de tout ce qui est au-dessus
 app.use(errorHandler);

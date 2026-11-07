@@ -50,10 +50,24 @@ export function ListeProvider({ children }) {
       charger()
     }
   }
+    // Ajouter un article du catalogue à la liste, puis recharger la liste
+  const ajouterArticle = async (item) => {
+    try {
+      const reponse = await fetch(API_URL_LISTE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: item.id }),
+      })
+      if (!reponse.ok) throw new Error("Erreur lors de l'ajout")
+      await charger()
+    } catch (error) {
+      setErreurApi(error.message)
+    }
+  }
 
   return (
     <ListeContext.Provider
-      value={{ articles, erreurApi, modifierArticle, supprimerArticle, recharger: charger }}
+      value={{ articles, erreurApi, modifierArticle, supprimerArticle, ajouterArticle, recharger: charger }}
     >
       {children}
     </ListeContext.Provider>

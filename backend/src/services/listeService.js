@@ -42,5 +42,21 @@ export const listeService = {
 
     const supprime = await listeModel.supprimerArticle(listId, articleId);
     if (!supprime) throw erreurMetier(404, 'Article introuvable');
+  },
+    async ajouterArticle(listId, { itemId, quantity = 1 }) {
+    if (!Number.isInteger(itemId)) {
+      throw erreurMetier(422, '"itemId" doit être un entier');
+    }
+    if (!Number.isInteger(quantity) || quantity < 1) {
+      throw erreurMetier(422, '"quantity" doit être un entier supérieur ou égal à 1');
+    }
+
+    const liste = await listeModel.trouverParId(listId);
+    if (!liste) throw erreurMetier(404, 'Liste de courses introuvable');
+
+    const item = await listeModel.trouverItemParId(itemId);
+    if (!item) throw erreurMetier(404, 'Article du catalogue introuvable');
+
+    return await listeModel.ajouterArticle(listId, itemId, quantity);
   }
 };
