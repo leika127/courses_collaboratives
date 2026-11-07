@@ -67,4 +67,15 @@ const me = async (req, res) => {
   return res.status(200).json({ user: user });
 };
 
-export const authController = { register, login, me };
+// POST /api/auth/logout
+const logout = async (req, res) => {
+  // Mêmes options qu'à la création, sinon le navigateur ne reconnaît pas le cookie à supprimer
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  });
+  return res.status(204).send();
+};
+
+export const authController = { register, login, me, logout };
