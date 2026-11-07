@@ -79,4 +79,15 @@ const login = async ({ email, password }) => {
   return { token: token, user: publicUser };
 };
 
-export const authService = { register, login };
+// Profil de la personne connectée (à partir de l'id lu dans le badge)
+const getProfile = async (userId) => {
+  const user = await userModel.findById(userId);
+
+  // Le badge est valide, mais le compte a pu être supprimé depuis
+  if (!user) {
+    throw httpError(401, 'Session invalide');
+  }
+  return user;
+};
+
+export const authService = { register, login, getProfile };
