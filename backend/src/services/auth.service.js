@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { pool } from '../db.js';
 import { familyModel } from '../models/family.model.js';
 import { userModel } from '../models/user.model.js';
@@ -46,4 +47,47 @@ const register = async ({ familyName, firstName, email, password }) => {
   }
 };
 
-export const authService = { register };
+// Connexion : vérifie email + mot de passe, renvoie un token et l'utilisateur
+const login = async ({ email, password }) => {
+  const normalizedEmail = email.trim().toLowerCase();
+  const user = await userModel.findByEmail(normalizedEmail);
+
+  // Même message dans les 2 cas : on ne révèle pas si l'email existe
+  if (!user) {
+    throw httpError(401, 'Email ou mot de passe incorrect');
+  }
+  const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+  if (!isPasswordValid) {
+    throw httpError(401, 'Email ou mot de passe incorrect');
+  }
+
+  // Le "badge" : ce qu'on met dedans sera lisible par le middleware auth
+  const token = jwt.sign(
+    { userId: user.id, role: user.role, familyId: user.familyId },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN },
+  );
+
+  // On renvoie l'utilisateur SANS le hash
+  const publicUser = {
+    id: user.id,
+    firstName: user.firstName,
+    email: user.email,
+    role: user.role,
+    familyId: user.familyId,
+  };
+  return { token: token, user: publicUser };
+};
+
+// Profil de la personne connectée (à partir de l'id lu dans le badge)
+const getProfile = async (userId) => {
+  const user = await userModel.findById(userId);
+
+  // Le badge est valide, mais le compte a pu être supprimé depuis
+  if (!user) {
+    throw httpError(401, 'Session invalide');
+  }
+  return user;
+};
+
+export const authService = { register, login, getProfile };
