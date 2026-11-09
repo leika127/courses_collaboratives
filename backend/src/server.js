@@ -1,25 +1,23 @@
-// import express from 'express';
-// import cors from 'cors';
 import 'dotenv/config';
-import { app } from './app.js'
+import { app } from './app.js';
 
-if(!process.env.JWT_SECRET) {
-    console.error("Il manque le JWT secret");
-    process.exit(1);
+// server.js : DÉMARRE l'application définie dans app.js
+
+// Sans clé secrète, impossible de signer les tokens : on refuse de démarrer
+if (!process.env.JWT_SECRET) {
+  console.error(
+    'JWT_SECRET manquant : copie .env.exemple en .env et remplis-le',
+  );
+  process.exit(1);
 }
-app.listen(3000, () => {
-    console.log("Fonctionne sur le port 3000");
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, (error) => {
+  if (error) {
+    console.error(`Impossible de démarrer le serveur : ${error.message}`);
+    return;
+  }
+  console.log(`Fonctionne sur le port ${PORT}`);
+  return;
 });
-
-
-
-
-
-
-
-// const app = express();
-// app.use(cors());
-
-// app.get("/", (req, res) => {
-//     res.send("Ok, la connexion est établie !")
-// });
