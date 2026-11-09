@@ -50,4 +50,20 @@ const create = async (
   return rows[0];
 };
 
-export const userModel = { findByEmail, findById, create };
+
+const findAllByFamilyId = async (familyId) => {
+  const { rows } = await pool.query(
+    `SELECT id,
+            name AS "firstName",
+            email,
+            role,
+            date_created AS "dateCreated"
+     FROM User_app
+     WHERE family_id = $1
+     ORDER BY name`,
+    [familyId],
+  );
+  return rows;
+};
+
+export const userModel = { findByEmail, findById, create, findAllByFamilyId };
