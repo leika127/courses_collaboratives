@@ -35,7 +35,7 @@ function ListeCourses() {
       )}
 
       {/* Barre de recherche et suggestions du catalogue */}
-      <section className="carte champ champ-recherche">
+      <section className="carte champ" style={{ position: 'relative' }}>
         <label htmlFor="recherche">Ajouter un article</label>
         <input
           id="recherche"
@@ -46,28 +46,45 @@ function ListeCourses() {
         />
 
         {catalogueFiltre.length > 0 && (
-          <ul className="suggestions-liste">
+          <ul className="suggestions-liste" style={{ 
+            listStyle: 'none', 
+            padding: '0', 
+            marginTop: '8px',
+            background: '#fff',
+            border: '1px solid #ccc',
+            borderRadius: '4px',
+            maxHeight: '180px',
+            overflowY: 'auto',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          }}>
             {catalogueFiltre.map((item) => (
-              <li
-                key={item.id}
-                className="suggestion-item"
+              <li 
+                key={item.id} 
                 onClick={() => {
                   if (ajouterArticle) {
                     ajouterArticle(item)
                   }
                   setRecherche('')
                 }}
+                style={{ 
+                  padding: '10px 12px', 
+                  cursor: 'pointer', 
+                  borderBottom: '1px solid #eee', 
+                  display: 'flex', 
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}
               >
                 <span>{item.nom || item.name}</span>
-                <span className="suggestion-ajout">+ Ajouter</span>
+                <span style={{ color: 'green', fontWeight: 'bold' }}>+ Ajouter</span>
               </li>
             ))}
           </ul>
         )}
       </section>
 
-      {/* Liste complète des courses : un cadre par article */}
-      <section className="liste-articles">
+      {/* Liste complète des courses */}
+      <section className="carte">
         {course.length === 0 ? (
           <p className="texte-gris">Aucun article dans la liste.</p>
         ) : (
@@ -82,17 +99,17 @@ function ListeCourses() {
               <label htmlFor={`article-${item.id}`}>{item.nom || item.name}</label>
 
               <div className="quantite-selecteur">
-                <button
-                  type="button"
-                  onClick={() => modifierArticle(item.id, { quantity: Math.max(1, (item.quantity || 1) - 1) })}
+                <button 
+                  type="button" 
+                  onClick={() => modifierArticle(item.id, { quantity: Math.max(1, (item.quantity || 1) - 1) })} 
                   className="btn-quantite"
                 >
                   −
                 </button>
                 <span className="badge">x{item.quantity || 1}</span>
-                <button
-                  type="button"
-                  onClick={() => modifierArticle(item.id, { quantity: (item.quantity || 1) + 1 })}
+                <button 
+                  type="button" 
+                  onClick={() => modifierArticle(item.id, { quantity: (item.quantity || 1) + 1 })} 
                   className="btn-quantite"
                 >
                   +
