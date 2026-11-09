@@ -24,7 +24,10 @@ export const listeController = {
         return res.status(422).json({ error: "Format d'ID invalide" });
       }
 
-      const articles = await listeService.recupererArticlesDeLaListe(listId);
+      const articles = await listeService.recupererArticlesDeLaListe(
+        listId,
+        req.utilisateur.familyId,
+      );
       return res.status(200).json(articles);
     } catch (erreur) {
       return sendError(res, erreur);
@@ -40,10 +43,15 @@ export const listeController = {
       }
 
       const { achete, quantity } = req.body ?? {};
-      const article = await listeService.modifierArticle(listId, articleId, {
-        achete,
-        quantity,
-      });
+      const article = await listeService.modifierArticle(
+        listId,
+        req.utilisateur.familyId,
+        articleId,
+        {
+          achete,
+          quantity,
+        },
+      );
       return res.status(200).json(article);
     } catch (erreur) {
       return sendError(res, erreur);
@@ -58,7 +66,11 @@ export const listeController = {
         return res.status(422).json({ error: "Format d'ID invalide" });
       }
 
-      await listeService.supprimerArticle(listId, articleId);
+      await listeService.supprimerArticle(
+        listId,
+        req.utilisateur.familyId,
+        articleId,
+      );
       return res.status(204).send();
     } catch (erreur) {
       return sendError(res, erreur);
@@ -73,10 +85,14 @@ export const listeController = {
       }
 
       const { itemId, quantity } = req.body ?? {};
-      const article = await listeService.ajouterArticle(listId, { itemId, quantity });
+      const article = await listeService.ajouterArticle(
+        listId,
+        req.utilisateur.familyId,
+        { itemId, quantity },
+      );
       return res.status(201).json(article);
     } catch (erreur) {
       return sendError(res, erreur);
     }
-  }
+  },
 };

@@ -3,8 +3,8 @@ import { pool } from '../db.js';
 export const listeModel = {
   async trouverParId(id) {
     const { rows } = await pool.query(
-      'SELECT id, name FROM List WHERE id = $1',
-      [id]
+      'SELECT id, name, family_id AS "familyId" FROM List WHERE id = $1',
+      [id],
     );
     return rows[0] ?? null;
   },
@@ -16,7 +16,7 @@ export const listeModel = {
        JOIN Item i ON i.id = li.item_id
        WHERE li.list_id = $1
        ORDER BY li.id`,
-      [listId]
+      [listId],
     );
     return rows;
   },
@@ -28,7 +28,7 @@ export const listeModel = {
            quantity   = COALESCE($2, quantity)
        WHERE id = $3 AND list_id = $4
        RETURNING id, is_checked AS achete, quantity`,
-      [achete ?? null, quantity ?? null, articleId, listId]
+      [achete ?? null, quantity ?? null, articleId, listId],
     );
     return rows[0] ?? null;
   },
@@ -36,12 +36,14 @@ export const listeModel = {
   async supprimerArticle(listId, articleId) {
     const { rowCount } = await pool.query(
       'DELETE FROM List_item WHERE id = $1 AND list_id = $2',
-      [articleId, listId]
+      [articleId, listId],
     );
     return rowCount > 0;
   },
-    async trouverItemParId(id) {
-    const { rows } = await pool.query('SELECT id FROM Item WHERE id = $1', [id]);
+  async trouverItemParId(id) {
+    const { rows } = await pool.query('SELECT id FROM Item WHERE id = $1', [
+      id,
+    ]);
     return rows[0] ?? null;
   },
 
@@ -58,8 +60,8 @@ export const listeModel = {
        SELECT a.id, i.name AS nom, a.is_checked AS achete, a.quantity
        FROM ajout a
        JOIN Item i ON i.id = a.item_id`,
-      [listId, itemId, quantity]
+      [listId, itemId, quantity],
     );
     return rows[0];
-  }
+  },
 };
