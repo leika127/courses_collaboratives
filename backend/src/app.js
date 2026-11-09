@@ -6,6 +6,7 @@ import { authRouter } from './routes/auth.routes.js';
 import { listesRouter } from './routes/listes.js';
 import { itemsRouter } from './routes/items.js';
 import { categoriesRouter } from './routes/categories.js';
+import { userRouter } from './routes/user.routes.js';
 // import swaggerUi from 'swagger-ui-express';
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
@@ -31,6 +32,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/listes', listesRouter);
 app.use('/api/items', itemsRouter);
 app.use('/api/categories', categoriesRouter);
+app.use('/api/users', userRouter);
 
 // Toujours en DERNIER : reçoit les erreurs de tout ce qui est au-dessus
 app.use(errorHandler);
