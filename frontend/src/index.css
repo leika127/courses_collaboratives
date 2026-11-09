@@ -27,7 +27,9 @@
   --pilule: 999px;
 }
 
-* {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -267,8 +269,15 @@ select {
 
 .ligne-article label {
   flex: 1;
-  padding: 14px 0;
+  padding: 12px 0;
+  font-size: 18px;
   font-weight: 500;
+  cursor: pointer;
+}
+
+/* article déjà pris : cadre sans fond, texte barré */
+.ligne-article.pris {
+  background: transparent;
 }
 
 .ligne-article.pris label,

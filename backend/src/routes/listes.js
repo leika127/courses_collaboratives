@@ -8,3 +8,4 @@ export const listesRouter = Router();
 listesRouter.get('/:id/articles', listeController.getArticles);
 listesRouter.patch('/:id/articles/:articleId', listeController.updateArticle);
 listesRouter.delete('/:id/articles/:articleId', listeController.deleteArticle);
+listesRouter.post('/:id/articles', listeController.addArticle);

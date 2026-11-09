@@ -64,4 +64,20 @@ export const listeController = {
         .json({ error: erreur.message || 'Erreur serveur' });
     }
   },
+
+  async addArticle(req, res) {
+    try {
+      const listId = Number(req.params.id);
+      if (isNaN(listId)) {
+        return res.status(422).json({ error: "Format d'ID invalide" });
+      }
+
+      const { itemId, quantity } = req.body;
+      const article = await listeService.ajouterArticle(listId, { itemId, quantity });
+      return res.status(201).json(article);
+    } catch (erreur) {
+      const status = erreur.status || 500;
+      return res.status(status).json({ error: erreur.message || 'Erreur serveur' });
+    }
+  }
 };

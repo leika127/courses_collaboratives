@@ -5,6 +5,7 @@ import { authRouter } from './routes/auth.js';
 import { listesRouter } from './routes/listes.js';
 import { itemsRouter } from './routes/items.js';
 import { gestionErreurs } from './middlewares/errors.js';
+import { categoriesRouter } from './routes/categories.js';
 
 export const app = express();
 
@@ -20,5 +21,6 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/listes', listesRouter);
 app.use('/api/items', itemsRouter);
+app.use('/api/categories', categoriesRouter);
 
 app.use(gestionErreurs);
