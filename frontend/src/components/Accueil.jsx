@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useListe } from '../ListeContext'
 
+// Les rayons affichés en tuiles (à adapter à tes vrais rayons)
+const rayons = [
+  { id: 'fruits-legumes', nom: 'Fruits et légumes' },
+  { id: 'frais', nom: 'Produits frais' },
+  { id: 'epicerie', nom: 'Épicerie' },
+  { id: 'boissons', nom: 'Boissons' },
+]
+
 // Le prénom viendra de la connexion plus tard : pour l'instant, "Camille" par défaut
 function Accueil({ prenom = 'Camille' }) {
   const { articles } = useListe()
@@ -10,6 +18,10 @@ function Accueil({ prenom = 'Camille' }) {
   const restants = total - pris
   const pourcentage = total === 0 ? 0 : Math.round((pris / total) * 100)
   const prochains = articles.filter((item) => !item.achete).slice(0, 3)
+
+  // Nombre d'articles restants dans un rayon (suppose que chaque article a un champ "rayon")
+  const compterRayon = (idRayon) =>
+    articles.filter((item) => item.rayon === idRayon && !item.achete).length
 
   return (
     <>
@@ -43,9 +55,24 @@ function Accueil({ prenom = 'Camille' }) {
         <Link to="/liste" className="bouton">Voir toute la liste</Link>
       </section>
 
-      <Link to="/rayons" className="bouton bouton-secondaire" style={{ marginTop: 12 }}>
-          Voir tous les rayons
-        </Link>
+      <section aria-labelledby="titre-rayons">
+        <h2 id="titre-rayons">Choisir dans les rayons</h2>
+        <div className="grille-rayons" style={{ marginTop: 12 }}>
+          {rayons.map((rayon, index) => (
+            <Link
+              key={rayon.id}
+              to={`/rayons/${rayon.id}`}
+              className={`tuile tuile-${(index % 4) + 1}`}
+            >
+              <span className="tuile-numero">0{index + 1}</span>
+              <div>
+                <strong>{compterRayon(rayon.id)}</strong>
+                <span className="tuile-nom">{rayon.nom}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </>
   )
 }

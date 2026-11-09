@@ -8,8 +8,6 @@
   --encre: #111111;
   --gris: #6b6b6b;
   --filet: #e5e5e5;
-  --bordure: #cfcfcf;
-  --blanc: #ffffff;
 
   /* tuiles par rayon */
   --tuile-1: #d4e4f7;
@@ -20,7 +18,7 @@
   /* bouton principal : bleu ciel, texte noir dessus */
   --accent: #a9c8f2;
   --sur-accent: #111111;
-  --accent-soutenu: #5f8fd8; /* barre de progression / actif */
+  --accent-soutenu: #5f8fd8; /* barre de progression (meilleur contraste) */
 
   --alerte-fond: #efe6d6;
   --alerte-texte: #3a2f1c;
@@ -66,7 +64,6 @@ h2 {
 
 a {
   color: var(--encre);
-  text-decoration: none;
 }
 
 a:focus-visible,
@@ -214,23 +211,6 @@ summary:focus-visible {
   font-size: 16px;
 }
 
-.bouton-ajout {
-  min-height: 40px;
-  padding: 0 16px;
-  border: none;
-  border-radius: var(--pilule);
-  background: var(--accent);
-  color: var(--sur-accent);
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.bouton-ajout:active {
-  background: var(--accent-soutenu);
-}
-
 /* ==========================================================
    Formulaires
    ========================================================== */
@@ -252,7 +232,7 @@ select {
   height: 56px;
   width: 100%;
   padding: 0 16px;
-  border: 1.5px solid var(--bordure);
+  border: 1.5px solid #cfcfcf;
   border-radius: 14px;
   background: var(--fond);
   color: var(--encre);
@@ -266,49 +246,14 @@ select {
 }
 
 /* ==========================================================
-   Pages Liste et Rayons : en-têtes et structures de lignes
+   Liste d'articles : filets fins, pas de cartes
    ========================================================== */
-.entete-liste {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.sous-titre {
-  margin: 0;
-  color: var(--gris);
-  font-size: 18px;
-}
-
-.lien-retour {
-  color: var(--gris);
-  font-size: 16px;
-  text-decoration: none;
-}
-
-.liste-articles {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .ligne-article {
   display: flex;
   align-items: center;
   gap: 14px;
   min-height: 60px;
   border-top: 1px solid var(--filet);
-}
-
-.liste-articles .ligne-article {
-  gap: 12px;
-  min-height: 68px;
-  padding: 8px 12px 8px 16px;
-  border: 1px solid var(--filet);
-  border-top: none;
-  border-bottom: 1px solid var(--filet);
-  border-radius: 20px;
-  background: var(--fond);
 }
 
 .ligne-article:first-child {
@@ -341,19 +286,8 @@ select {
   text-decoration: line-through;
 }
 
-.ligne-article.pris .badge {
-  text-decoration: none;
-}
-
 .nom-article {
   flex: 1;
-}
-
-.numero-article {
-  width: 22px;
-  flex: none;
-  color: var(--gris);
-  font-size: 15px;
 }
 
 /* ==========================================================
@@ -500,24 +434,12 @@ details.rayon[open] summary::after {
 }
 
 /* ==========================================================
-   Sélecteur de quantité (pilule groupée − x1 +)
+   Sélecteur de quantité
    ========================================================== */
 .quantite-selecteur {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid var(--filet);
-  border-radius: var(--pilule);
-  background: var(--fond);
-}
-
-.quantite-selecteur .badge {
-  min-width: 34px;
-  padding: 4px 6px;
-  text-align: center;
-  background: transparent;
-  font-weight: 700;
+  gap: 6px;
 }
 
 .btn-quantite,
@@ -525,8 +447,8 @@ details.rayon[open] summary::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: 50%;
   background: var(--tuile-1);
@@ -539,15 +461,12 @@ details.rayon[open] summary::after {
 
 .btn-supprimer {
   font-size: 14px;
-  background: transparent;
-  color: var(--gris);
 }
 
 .btn-quantite:active,
 .btn-supprimer:active {
   transform: scale(0.92);
-  background: var(--tuile-3);
-  color: var(--encre);
+  background: var(--accent);
 }
 
 /* ==========================================================
@@ -585,9 +504,76 @@ details.rayon[open] summary::after {
   background: var(--tuile-1);
   border-radius: 14px;
 }
+/* ==========================================================
+   Liste de courses : chaque article dans son cadre
+   ========================================================== */
+.liste-articles {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.liste-articles .ligne-article {
+  min-height: 68px;
+  padding: 8px 12px 8px 16px;
+  border: 1px solid var(--filet);
+  border-radius: 20px;
+  background: var(--fond);
+}
+
+.liste-articles .ligne-article:first-child {
+  border-top: 1px solid var(--filet);
+}
+
+.liste-articles .ligne-article label {
+  padding: 12px 0;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* article déjà pris : cadre sans fond, texte barré (sauf la quantité) */
+.liste-articles .ligne-article.pris {
+  background: transparent;
+}
+
+.liste-articles .ligne-article.pris .badge {
+  text-decoration: none;
+}
+
+/* quantité : une pilule qui regroupe − x1 + */
+.quantite-selecteur {
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--filet);
+  border-radius: var(--pilule);
+}
+
+.quantite-selecteur .badge {
+  min-width: 34px;
+  padding: 4px 6px;
+  text-align: center;
+  background: transparent;
+  font-weight: 700;
+}
+
+.quantite-selecteur .btn-quantite {
+  width: 30px;
+  height: 30px;
+}
+
+/* supprimer : discret, sans fond */
+.liste-articles .btn-supprimer {
+  background: transparent;
+  color: var(--gris);
+}
+
+.liste-articles .btn-supprimer:active {
+  background: var(--tuile-3);
+  color: var(--encre);
+}
 
 /* ==========================================================
-   Recherche et suggestions
+   Recherche et suggestions (remplace les style={{ ... }})
    ========================================================== */
 .champ-recherche {
   position: relative;
