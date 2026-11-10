@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { pool } from '../db.js';
 import { familyModel } from '../models/family.model.js';
+import { listeModel } from '../models/listeModel.js';
 import { userModel } from '../models/user.model.js';
 import { httpError } from '../utils/httpError.js';
 
@@ -32,6 +33,9 @@ const register = async ({ familyName, firstName, email, password }) => {
       },
       client,
     );
+
+    // Chaque nouvelle famille commence avec une liste de courses vide
+    await listeModel.creer('Ma liste', family.id, client);
 
     await client.query('COMMIT');
     return { family: family, user: user };
