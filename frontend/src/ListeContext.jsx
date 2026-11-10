@@ -1,18 +1,23 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-
-const API_URL_LISTE = 'http://localhost:3000/api/listes/1/articles'
+import { requete } from './api/client'
+import { useAuth } from './AuthContext'
 
 const ListeContext = createContext(null)
 
 export function ListeProvider({ children }) {
+  const { utilisateur } = useAuth()
+  const [listeId, setListeId] = useState(null)
   const [articles, setArticles] = useState([])
   const [erreurApi, setErreurApi] = useState(null)
 
   const charger = useCallback(async () => {
     try {
-      const reponse = await fetch(API_URL_LISTE)
-      if (!reponse.ok) throw new Error('Erreur chargement liste')
-      const data = await reponse.json()
+      // La liste de la famille connectée (plus la liste n°1 écrite en dur)
+      const listes = await requete('/api/listes')
+      if (listes.length === 0) return
+      const id = listes[0].id
+      const data = await requete(`/api/listes/${id}/articles`)
+      setListeId(id)
       setArticles(data.map((item) => ({ ...item, achete: Boolean(item.achete) })))
       setErreurApi(null)
     } catch (error) {
@@ -20,20 +25,20 @@ export function ListeProvider({ children }) {
     }
   }, [])
 
+  // On ne charge que si quelqu'un est connecté (sinon l'API répond 401)
   useEffect(() => {
-    charger()
-  }, [charger])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (utilisateur) charger()
+  }, [utilisateur, charger])
 
   // Modifier un article (achete, quantity) : on met à jour le state, puis l'API
   const modifierArticle = async (id, changes) => {
     setArticles((prev) => prev.map((a) => (a.id === id ? { ...a, ...changes } : a)))
     try {
-      const reponse = await fetch(`${API_URL_LISTE}/${id}`, {
+      await requete(`/api/listes/${listeId}/articles/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(changes),
       })
-      if (!reponse.ok) throw new Error('Erreur modification')
     } catch (error) {
       setErreurApi(error.message)
       charger() // en cas d'échec, on resynchronise avec le serveur
@@ -43,8 +48,7 @@ export function ListeProvider({ children }) {
   const supprimerArticle = async (id) => {
     setArticles((prev) => prev.filter((a) => a.id !== id))
     try {
-      const reponse = await fetch(`${API_URL_LISTE}/${id}`, { method: 'DELETE' })
-      if (!reponse.ok) throw new Error('Erreur suppression')
+      await requete(`/api/listes/${listeId}/articles/${id}`, { method: 'DELETE' })
     } catch (error) {
       setErreurApi(error.message)
       charger()
@@ -53,12 +57,10 @@ export function ListeProvider({ children }) {
     // Ajouter un article du catalogue à la liste, puis recharger la liste
   const ajouterArticle = async (item) => {
     try {
-      const reponse = await fetch(API_URL_LISTE, {
+      await requete(`/api/listes/${listeId}/articles`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId: item.id }),
       })
-      if (!reponse.ok) throw new Error("Erreur lors de l'ajout")
       await charger()
     } catch (error) {
       setErreurApi(error.message)
@@ -67,13 +69,14 @@ export function ListeProvider({ children }) {
 
   return (
     <ListeContext.Provider
-      value={{ articles, erreurApi, modifierArticle, supprimerArticle, ajouterArticle, recharger: charger }}
+      value={{ articles: utilisateur ? articles : [], erreurApi, modifierArticle, supprimerArticle, ajouterArticle, recharger: charger }}
     >
       {children}
     </ListeContext.Provider>
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useListe() {
   return useContext(ListeContext)
 }
