@@ -24,4 +24,4 @@ function NavBas() {
   )
 }
 
-export default NavBas
+export default NavBas

@@ -52,4 +52,4 @@ function Accueil() {
   )
 }
 
-export default Accueil
+export default Accueil
