@@ -1,17 +1,974 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "API courses collaboratives",
+    "title": "API Courses collaboratives",
     "version": "1.0.0",
-    "description": "API de gestion decourses"
+    "description": "API de l'application de liste de courses partagée en famille (projet Lovelace Factory, Ada Tech School).\n\n**Authentification** : `POST /auth/login` pose un cookie httpOnly `token` (JWT, valable 7 jours). Le navigateur le renvoie ensuite tout seul. Les routes marquées d'un cadenas exigent ce cookie.\n\n**Pour tester ici** : appelez d'abord `POST /auth/login` avec « Try it out » ; le cookie est enregistré par le navigateur et les routes protégées fonctionnent ensuite.\n\n**Erreurs** : toutes les erreurs ont la forme `{ \"error\": \"message\" }`."
   },
-  "servers": [{ "url": "/api" }],
+  "servers": [
+    {
+      "url": "/api",
+      "description": "Serveur courant"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentification",
+      "description": "Inscription, connexion, profil, déconnexion"
+    },
+    {
+      "name": "Listes",
+      "description": "Listes de courses de la famille connectée et leurs articles"
+    },
+    {
+      "name": "Catalogue",
+      "description": "Articles et rayons (public)"
+    }
+  ],
   "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Créer une famille et son organisateur",
+        "description": "Crée, en une seule transaction, une famille, son organisateur (rôle `organizer`) et une liste vide « Ma liste ». L'email est enregistré sans espaces et en minuscules. Ne connecte pas : appeler ensuite `POST /auth/login`.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Inscription"
+              },
+              "example": {
+                "familyName": "Famille Martin",
+                "firstName": "Anthony",
+                "email": "anthony@exemple.fr",
+                "password": "motdepasse123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Famille et compte créés",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InscriptionReponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Champ manquant ou vide, mot de passe trop court (8 caractères minimum), ou JSON invalide",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Tous les champs sont obligatoires"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email déjà utilisé",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Cet email est déjà utilisé"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "inscrire",
+        "security": []
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Se connecter",
+        "description": "Vérifie l'email et le mot de passe. En cas de succès, pose le cookie httpOnly `token` (JWT, 7 jours). Même message d'erreur que l'email soit inconnu ou le mot de passe faux.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Connexion"
+              },
+              "example": {
+                "email": "anthony@exemple.fr",
+                "password": "motdepasse123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connecté",
+            "headers": {
+              "Set-Cookie": {
+                "description": "`token=<JWT>; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax`",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UtilisateurReponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email ou mot de passe manquant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Email et mot de passe obligatoires"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Identifiants incorrects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Email ou mot de passe incorrect"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "connecter",
+        "security": []
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Profil de la personne connectée",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "description": "Permet au front de savoir si quelqu'un est connecté (par exemple au chargement de la page).",
+        "responses": {
+          "200": {
+            "description": "Profil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UtilisateurReponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "monProfil"
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentification"
+        ],
+        "summary": "Se déconnecter",
+        "description": "Efface le cookie `token`. Ne renvoie pas d'erreur si personne n'est connecté.",
+        "responses": {
+          "204": {
+            "description": "Déconnecté (cookie effacé)",
+            "headers": {
+              "Set-Cookie": {
+                "description": "`token=; Expires=Thu, 01 Jan 1970 00:00:00 GMT`",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deconnecter",
+        "security": []
+      }
+    },
+    "/listes": {
+      "get": {
+        "tags": [
+          "Listes"
+        ],
+        "summary": "Listes de ma famille",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "description": "Renvoie les listes de la famille de la personne connectée, de la plus ancienne à la plus récente.",
+        "responses": {
+          "200": {
+            "description": "Listes de la famille",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Liste"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "listesDeMaFamille"
+      }
+    },
+    "/listes/{id}/articles": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Identifiant de la liste",
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        }
+      ],
+      "get": {
+        "tags": [
+          "Listes"
+        ],
+        "summary": "Articles d'une liste",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Articles de la liste",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ArticleListe"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "403": {
+            "description": "La liste appartient à une autre famille",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Cette liste n'appartient pas à votre famille"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Liste inexistante",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Liste de courses introuvable"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Identifiant invalide (doit être un entier supérieur à 0)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Format d'ID invalide"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "articlesDeLaListe"
+      },
+      "post": {
+        "tags": [
+          "Listes"
+        ],
+        "summary": "Ajouter un article du catalogue",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "description": "Ajoute un article du catalogue à la liste. S'il y est déjà, sa quantité est augmentée.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AjoutArticle"
+              },
+              "example": {
+                "itemId": 5,
+                "quantity": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Article ajouté (ou quantité augmentée)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleListe"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "403": {
+            "description": "La liste appartient à une autre famille",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Cette liste n'appartient pas à votre famille"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Liste ou article du catalogue inexistant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Article du catalogue introuvable"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Identifiant de liste invalide, `itemId` absent ou non entier, ou `quantity` inférieure à 1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "\"itemId\" doit être un entier"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "ajouterArticle"
+      }
+    },
+    "/listes/{id}/articles/{articleId}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Identifiant de la liste",
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 1
+        },
+        {
+          "name": "articleId",
+          "in": "path",
+          "required": true,
+          "description": "Identifiant de la ligne de la liste (champ `id` renvoyé par GET /listes/{id}/articles)",
+          "schema": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "example": 3
+        }
+      ],
+      "patch": {
+        "tags": [
+          "Listes"
+        ],
+        "summary": "Cocher un article ou changer sa quantité",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModificationArticle"
+              },
+              "example": {
+                "achete": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Article modifié",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleModifie"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "403": {
+            "description": "La liste appartient à une autre famille",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Cette liste n'appartient pas à votre famille"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Liste ou article inexistant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Article introuvable"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Identifiant invalide, aucun champ à modifier, `achete` non booléen ou `quantity` inférieure à 1",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Aucun champ à modifier"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "modifierArticle"
+      },
+      "delete": {
+        "tags": [
+          "Listes"
+        ],
+        "summary": "Retirer un article de la liste",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Article retiré"
+          },
+          "401": {
+            "$ref": "#/components/responses/NonConnecte"
+          },
+          "403": {
+            "description": "La liste appartient à une autre famille",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Cette liste n'appartient pas à votre famille"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Liste ou article inexistant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Article introuvable"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Identifiant invalide (doit être un entier supérieur à 0)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Erreur"
+                },
+                "example": {
+                  "error": "Format d'ID invalide"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "supprimerArticle"
+      }
+    },
+    "/items": {
+      "get": {
+        "tags": [
+          "Catalogue"
+        ],
+        "summary": "Tous les articles du catalogue",
+        "description": "Triés par nom. Route publique.",
+        "responses": {
+          "200": {
+            "description": "Articles du catalogue",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Item"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "catalogueArticles",
+        "security": []
+      }
+    },
     "/categories": {
       "get": {
-        "summary": "Liste toutes les catégories",
+        "tags": [
+          "Catalogue"
+        ],
+        "summary": "Rayons avec leurs articles",
+        "description": "Chaque rayon avec la liste de ses articles. Route publique.",
         "responses": {
-          "200": { "description": "La liste des catégories (id et libelle)" }
+          "200": {
+            "description": "Rayons",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Rayon"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErreurServeur"
+          }
+        },
+        "operationId": "rayons",
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token",
+        "description": "JWT posé par `POST /auth/login`"
+      }
+    },
+    "responses": {
+      "NonConnecte": {
+        "description": "Pas connecté, ou session expirée / invalide",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erreur"
+            },
+            "example": {
+              "error": "Connexion requise"
+            }
+          }
+        }
+      },
+      "ErreurServeur": {
+        "description": "Erreur imprévue (le détail est dans la console du serveur)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Erreur"
+            },
+            "example": {
+              "error": "Erreur serveur"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Erreur": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "example": "Message d'erreur"
+          }
+        }
+      },
+      "Inscription": {
+        "type": "object",
+        "required": [
+          "familyName",
+          "firstName",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "familyName": {
+            "type": "string",
+            "minLength": 1,
+            "example": "Famille Martin"
+          },
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "example": "Anthony"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "anthony@exemple.fr"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 8,
+            "example": "motdepasse123"
+          }
+        }
+      },
+      "Connexion": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "anthony@exemple.fr"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "motdepasse123"
+          }
+        }
+      },
+      "Famille": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "name": {
+            "type": "string",
+            "example": "Famille Martin"
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Utilisateur": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "firstName": {
+            "type": "string",
+            "example": "Anthony"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "anthony@exemple.fr"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "organizer",
+              "member"
+            ],
+            "example": "organizer"
+          },
+          "familyId": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      },
+      "InscriptionReponse": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "$ref": "#/components/schemas/Famille"
+          },
+          "user": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        }
+      },
+      "UtilisateurReponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/Utilisateur"
+          }
+        }
+      },
+      "Liste": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 2
+          },
+          "name": {
+            "type": "string",
+            "example": "Ma liste"
+          },
+          "dateCreated": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ArticleListe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Identifiant de la ligne dans la liste",
+            "example": 31
+          },
+          "nom": {
+            "type": "string",
+            "example": "Carottes"
+          },
+          "achete": {
+            "type": "boolean",
+            "example": false
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          }
+        }
+      },
+      "ArticleModifie": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 31
+          },
+          "achete": {
+            "type": "boolean",
+            "example": true
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "AjoutArticle": {
+        "type": "object",
+        "required": [
+          "itemId"
+        ],
+        "properties": {
+          "itemId": {
+            "type": "integer",
+            "description": "Identifiant de l'article du catalogue (GET /items)",
+            "example": 5
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1,
+            "example": 1
+          }
+        }
+      },
+      "ModificationArticle": {
+        "type": "object",
+        "description": "Au moins un des deux champs",
+        "minProperties": 1,
+        "properties": {
+          "achete": {
+            "type": "boolean",
+            "example": true
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 2
+          }
+        }
+      },
+      "Item": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 5
+          },
+          "name": {
+            "type": "string",
+            "example": "Carottes"
+          },
+          "price": {
+            "type": "number",
+            "nullable": true,
+            "example": null
+          },
+          "category_id": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "Rayon": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Fruits et légumes"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "integer",
+                  "example": 5
+                },
+                "name": {
+                  "type": "string",
+                  "example": "Carottes"
+                }
+              }
+            }
+          }
         }
       }
     }
