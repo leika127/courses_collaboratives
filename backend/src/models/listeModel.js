@@ -1,6 +1,25 @@
 import { pool } from '../db.js';
 
 export const listeModel = {
+  // Toutes les listes d'une famille (la plus ancienne en premier)
+  async trouverParFamille(familyId) {
+    const { rows } = await pool.query(
+      'SELECT id, name, date_created AS "dateCreated" FROM List WHERE family_id = $1 ORDER BY id',
+      [familyId],
+    );
+    return rows;
+  },
+
+  // Crée une liste pour une famille
+  // db : la connexion à utiliser (pool par défaut, ou le client d'une transaction)
+  async creer(name, familyId, db = pool) {
+    const { rows } = await db.query(
+      'INSERT INTO List (name, family_id) VALUES ($1, $2) RETURNING id, name, date_created AS "dateCreated"',
+      [name, familyId],
+    );
+    return rows[0];
+  },
+
   async trouverParId(id) {
     const { rows } = await pool.query(
       'SELECT id, name, family_id AS "familyId" FROM List WHERE id = $1',

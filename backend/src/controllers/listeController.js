@@ -16,6 +16,16 @@ const sendError = (res, erreur) => {
 };
 
 export const listeController = {
+  // GET /api/listes : les listes de la famille de la personne connectée
+  async getListes(req, res) {
+    try {
+      const listes = await listeService.recupererListesDeLaFamille(req.utilisateur.familyId);
+      return res.status(200).json(listes);
+    } catch (erreur) {
+      return sendError(res, erreur);
+    }
+  },
+
   async getArticles(req, res) {
     try {
       const listId = Number(req.params.id);
