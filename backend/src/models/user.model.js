@@ -31,6 +31,20 @@ const findById = async (id) => {
   return rows[0] ?? null;
 };
 
+const findAllByFamilyId = async (familyId) => {
+  const { rows } = await pool.query(
+    `SELECT id,
+            name AS "firstName",
+            email,
+            role,
+            date_created AS "dateCreated"
+     FROM User_app
+     WHERE family_id = $1
+     ORDER BY id`,
+    [familyId],
+  );
+  return rows;
+};
 // Crée un utilisateur et le renvoie (SANS le hash du mot de passe)
 // db : la connexion à utiliser (pool par défaut, ou le client d'une transaction)
 const create = async (
@@ -50,4 +64,4 @@ const create = async (
   return rows[0];
 };
 
-export const userModel = { findByEmail, findById, create };
+export const userModel = { findByEmail, findById, create, findAllByFamilyId };
