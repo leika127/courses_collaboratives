@@ -18,6 +18,10 @@ const trouverListeDeLaFamille = async (listId, familyId) => {
 };
 
 export const listeService = {
+  async recupererListesDeLaFamille(familyId) {
+    return await listeModel.trouverParFamille(familyId);
+  },
+
   async recupererArticlesDeLaListe(listId, familyId) {
     // Règle métier : la liste existe et appartient à la famille
     await trouverListeDeLaFamille(listId, familyId);
