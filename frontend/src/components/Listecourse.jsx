@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useListe } from '../ListeContext'
+import { requete } from '../api/client'
 
 function ListeCourses() {
   const { articles: course, erreurApi, modifierArticle, supprimerArticle, ajouterArticle } = useListe()
@@ -8,8 +9,7 @@ function ListeCourses() {
 
   // Charger le catalogue d'articles pour la recherche
   useEffect(() => {
-    fetch('http://localhost:3000/api/items')
-      .then((res) => res.json())
+    requete('/api/items')
       .then((data) => setCatalogue(data))
       .catch((err) => console.log('Erreur chargement catalogue', err))
   }, [])
@@ -132,4 +132,4 @@ function ListeCourses() {
   )
 }
 
-export default ListeCourses
+export default ListeCourses

@@ -1,79 +1,114 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { requete } from './api/client';
+import { useAuth } from './AuthContext';
 
-const API_URL_LISTE = 'http://localhost:3000/api/listes/1/articles'
-
-const ListeContext = createContext(null)
+const ListeContext = createContext(null);
 
 export function ListeProvider({ children }) {
-  const [articles, setArticles] = useState([])
-  const [erreurApi, setErreurApi] = useState(null)
+  const { utilisateur } = useAuth();
+  const [listeId, setListeId] = useState(null);
+  const [articles, setArticles] = useState([]);
+  const [erreurApi, setErreurApi] = useState(null);
 
+  // Charge la liste de la famille connectée : d'abord son id, puis ses articles
   const charger = useCallback(async () => {
     try {
-      const reponse = await fetch(API_URL_LISTE)
-      if (!reponse.ok) throw new Error('Erreur chargement liste')
-      const data = await reponse.json()
-      setArticles(data.map((item) => ({ ...item, achete: Boolean(item.achete) })))
-      setErreurApi(null)
+      const listes = await requete('/api/listes');
+      if (listes.length === 0) {
+        setListeId(null);
+        setArticles([]);
+        return;
+      }
+      const id = listes[0].id;
+      const data = await requete(`/api/listes/${id}/articles`);
+      setListeId(id);
+      setArticles(data.map((item) => {
+        return { ...item, achete: Boolean(item.achete) };
+      }));
+      setErreurApi(null);
     } catch (error) {
-      setErreurApi(error.message)
+      setErreurApi(error.message);
     }
-  }, [])
+    return;
+  }, []);
 
+  // On charge seulement quand quelqu'un est connecté (sinon l'API répondrait 401)
   useEffect(() => {
-    charger()
-  }, [charger])
-
-  // Modifier un article (achete, quantity) : on met à jour le state, puis l'API
-  const modifierArticle = async (id, changes) => {
-    setArticles((prev) => prev.map((a) => (a.id === id ? { ...a, ...changes } : a)))
-    try {
-      const reponse = await fetch(`${API_URL_LISTE}/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changes),
-      })
-      if (!reponse.ok) throw new Error('Erreur modification')
-    } catch (error) {
-      setErreurApi(error.message)
-      charger() // en cas d'échec, on resynchronise avec le serveur
+    if (utilisateur) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      charger();
     }
-  }
+    return;
+  }, [utilisateur, charger]);
+
+  // Après une déconnexion, on n'affiche plus la liste de la personne précédente
+  const articlesAffiches = utilisateur ? articles : [];
+
+  // Modifier un article (achete, quantity) : on met à jour l'écran, puis l'API
+  const modifierArticle = async (id, changes) => {
+    setArticles((prev) => {
+      return prev.map((a) => {
+        return a.id === id ? { ...a, ...changes } : a;
+      });
+    });
+    try {
+      await requete(`/api/listes/${listeId}/articles/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(changes),
+      });
+    } catch (error) {
+      setErreurApi(error.message);
+      charger(); // en cas d'échec, on resynchronise avec le serveur
+    }
+    return;
+  };
 
   const supprimerArticle = async (id) => {
-    setArticles((prev) => prev.filter((a) => a.id !== id))
+    setArticles((prev) => {
+      return prev.filter((a) => {
+        return a.id !== id;
+      });
+    });
     try {
-      const reponse = await fetch(`${API_URL_LISTE}/${id}`, { method: 'DELETE' })
-      if (!reponse.ok) throw new Error('Erreur suppression')
+      await requete(`/api/listes/${listeId}/articles/${id}`, { method: 'DELETE' });
     } catch (error) {
-      setErreurApi(error.message)
-      charger()
+      setErreurApi(error.message);
+      charger();
     }
-  }
-    // Ajouter un article du catalogue à la liste, puis recharger la liste
+    return;
+  };
+
+  // Ajouter un article du catalogue à la liste, puis recharger la liste
   const ajouterArticle = async (item) => {
     try {
-      const reponse = await fetch(API_URL_LISTE, {
+      await requete(`/api/listes/${listeId}/articles`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId: item.id }),
-      })
-      if (!reponse.ok) throw new Error("Erreur lors de l'ajout")
-      await charger()
+      });
+      await charger();
     } catch (error) {
-      setErreurApi(error.message)
+      setErreurApi(error.message);
     }
-  }
+    return;
+  };
 
   return (
     <ListeContext.Provider
-      value={{ articles, erreurApi, modifierArticle, supprimerArticle, ajouterArticle, recharger: charger }}
+      value={{
+        articles: articlesAffiches,
+        erreurApi,
+        modifierArticle,
+        supprimerArticle,
+        ajouterArticle,
+        recharger: charger,
+      }}
     >
       {children}
     </ListeContext.Provider>
-  )
+  );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useListe() {
-  return useContext(ListeContext)
+  return useContext(ListeContext);
 }

@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useListe } from '../ListeContext'
+import { useAuth } from '../AuthContext'
 
-// Le prénom viendra de la connexion plus tard : pour l'instant, "Camille" par défaut
-function Accueil({ prenom = 'Camille' }) {
+function Accueil() {
   const { articles } = useListe()
+  const { utilisateur } = useAuth()
+  const prenom = utilisateur?.firstName ?? ''
 
   const total = articles.length
   const pris = articles.filter((item) => item.achete).length
@@ -50,4 +52,4 @@ function Accueil({ prenom = 'Camille' }) {
   )
 }
 
-export default Accueil
+export default Accueil

@@ -629,3 +629,28 @@ details.rayon[open] summary::after {
   font-size: 15px;
   font-weight: 700;
 }
+/* ==========================================================
+   Formulaires de connexion et d'inscription
+   ========================================================== */
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bouton:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.nav-bas .bouton-deconnexion {
+  flex: 1;
+  min-height: 56px;
+  border: none;
+  background: transparent;
+  color: var(--gris);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}

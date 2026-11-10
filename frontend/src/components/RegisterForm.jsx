@@ -1,21 +1,35 @@
 import { useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { requete } from '../api/client';
+import { useAuth } from '../AuthContext';
+
+const MOT_DE_PASSE_MIN = 8;
 
 const RegisterForm = () => {
+  const { utilisateur, connecter } = useAuth();
+  const navigate = useNavigate();
+
   // 1. Les states : une valeur par champ
   const [familyName, setFamilyName] = useState('');
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [erreur, setErreur] = useState('');
+  const [envoiEnCours, setEnvoiEnCours] = useState(false);
+
+  // Déjà connecté : pas besoin de cette page
+  if (utilisateur) {
+    return <Navigate to="/" replace />;
+  }
 
   // 2. Les fonctions : AVANT le return
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setErreur('');
+    setEnvoiEnCours(true);
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      await requete('/api/auth/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           familyName: familyName,
           firstName: firstName,
@@ -23,36 +37,27 @@ const RegisterForm = () => {
           password: password,
         }),
       });
-
-      const data = await response.json();
-
-      if (response.status === 201) {
-        setMessage(
-          `Compte créé ! Bienvenue dans la famille ${data.family.name}.`,
-        );
-        setFamilyName('');
-        setFirstName('');
-        setEmail('');
-        setPassword('');
-      } else {
-        setMessage(data.error || 'Erreur serveur');
-      }
+      // Compte créé : on connecte directement la personne
+      await connecter(email, password);
+      navigate('/');
     } catch (error) {
-      console.error(error);
-      setMessage('Impossible de contacter le serveur. Réessayez plus tard.');
+      setErreur(error.message);
+    } finally {
+      setEnvoiEnCours(false);
     }
     return;
   };
 
   // 3. Le JSX : toujours en dernier
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="carte formulaire" onSubmit={handleSubmit}>
       <h1>Créer le compte de ma famille</h1>
-      {message !== '' && <p role="status">{message}</p>}
+      {erreur !== '' && <p className="alerte" role="alert">{erreur}</p>}
 
-      <label>
-        Nom de la famille
+      <div className="champ">
+        <label htmlFor="nom-famille">Nom de la famille</label>
         <input
+          id="nom-famille"
           type="text"
           value={familyName}
           autoComplete="family-name"
@@ -61,11 +66,12 @@ const RegisterForm = () => {
           }}
           required
         />
-      </label>
+      </div>
 
-      <label>
-        Prénom
+      <div className="champ">
+        <label htmlFor="prenom">Prénom</label>
         <input
+          id="prenom"
           type="text"
           value={firstName}
           autoComplete="given-name"
@@ -74,11 +80,12 @@ const RegisterForm = () => {
           }}
           required
         />
-      </label>
+      </div>
 
-      <label>
-        Adresse email
+      <div className="champ">
+        <label htmlFor="email">Adresse email</label>
         <input
+          id="email"
           type="email"
           value={email}
           autoComplete="email"
@@ -87,22 +94,29 @@ const RegisterForm = () => {
           }}
           required
         />
-      </label>
+      </div>
 
-      <label>
-        Mot de passe
+      <div className="champ">
+        <label htmlFor="mot-de-passe">Mot de passe ({MOT_DE_PASSE_MIN} caractères minimum)</label>
         <input
+          id="mot-de-passe"
           type="password"
           value={password}
           autoComplete="new-password"
+          minLength={MOT_DE_PASSE_MIN}
           onChange={(event) => {
             return setPassword(event.target.value);
           }}
           required
         />
-      </label>
+      </div>
 
-      <button type="submit">Créer le compte</button>
+      <button type="submit" className="bouton" disabled={envoiEnCours}>
+        {envoiEnCours ? 'Création…' : 'Créer le compte'}
+      </button>
+      <p className="texte-gris">
+        Déjà un compte ? <Link to="/connexion">Se connecter</Link>
+      </p>
     </form>
   );
 };
