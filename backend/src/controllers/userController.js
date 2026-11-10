@@ -1,4 +1,4 @@
-import { userService } from '../services/user.service.js';
+import { userService } from '../services/userService.js';
 
 const list = async (req, res) => {
   const users = await userService.listFamilyUsers(req.utilisateur.familyId);
