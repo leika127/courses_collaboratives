@@ -6,8 +6,10 @@ import { authRouter } from './routes/auth.routes.js';
 import { listesRouter } from './routes/listes.js';
 import { itemsRouter } from './routes/items.js';
 import { categoriesRouter } from './routes/categories.js';
+import { userRouter } from './routes/user.routes.js';
 import swaggerUi from 'swagger-ui-express';
 import { readFileSync } from 'node:fs';
+
 
 // app.js : CE QUE FAIT l'application (middlewares, routes)
 // Il ne démarre PAS le serveur : c'est le rôle de server.js
@@ -35,6 +37,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Branchement des routeurs avec leurs préfixes
 app.use('/api/auth', authRouter);
 app.use('/api/listes', listesRouter);
+app.use('/api/users', userRouter);
 app.use('/api/items', itemsRouter);
 app.use('/api/categories', categoriesRouter);
 
