@@ -19,13 +19,15 @@ const findByEmail = async (email) => {
 // Cherche un utilisateur par son id (SANS le hash : sert à renvoyer le profil)
 const findById = async (id) => {
   const { rows } = await pool.query(
-    `SELECT id,
-            name AS "firstName",
-            email,
-            role,
-            family_id AS "familyId"
-     FROM User_app
-     WHERE id = $1`,
+    `SELECT u.id,
+            u.name AS "firstName",
+            u.email,
+            u.role,
+            u.family_id AS "familyId",
+            f.name AS "familyName"
+     FROM User_app u
+     JOIN Family f ON f.id = u.family_id
+     WHERE u.id = $1`,
     [id],
   );
   return rows[0] ?? null;
