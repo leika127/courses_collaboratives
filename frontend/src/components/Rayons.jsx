@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useCategories } from '../useCategories'
+import { iconeRayon } from '../iconesRayons'
 
 function Rayons() {
   const { categories, erreur } = useCategories()
@@ -26,7 +27,7 @@ function Rayons() {
             to={`/rayons/${categorie.id}`}
             className={`tuile tuile-${(index % 4) + 1}`}
           >
-            <span className="tuile-numero">{String(index + 1).padStart(2, '0')}</span>
+            <span className="tuile-icone" aria-hidden="true">{iconeRayon(categorie.name)}</span>
             <div>
               <strong>{categorie.items.length}</strong>
               <span className="tuile-nom">{categorie.name}</span>

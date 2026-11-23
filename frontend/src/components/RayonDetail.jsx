@@ -1,19 +1,36 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useCategories } from '../useCategories'
 import { useListe } from '../ListeContext'
+import { iconeRayon, iconeArticle } from '../iconesRayons'
 
 function RayonDetail() {
   const { id } = useParams()
   const { categories, erreur } = useCategories()
   const { articles, ajouterArticle } = useListe()
+  const [filtre, setFiltre] = useState('')
 
   const rayon = categories.find((c) => String(c.id) === id)
   const dansLaListe = (nom) =>
     articles.some((a) => (a.nom || a.name || '').toLowerCase() === nom.toLowerCase())
 
+  const itemsAffiches = rayon
+    ? rayon.items.filter((item) => item.name.toLowerCase().includes(filtre.toLowerCase()))
+    : []
+
   return (
     <>
-      <Link to="/rayons" className="lien-retour">← Tous les rayons</Link>
+      <header className="entete-collant entete-rayon">
+        <Link to="/rayons" className="btn-retour" aria-label="Retour aux rayons">←</Link>
+        {rayon && (
+          <div>
+            <h1>{iconeRayon(rayon.name)} {rayon.name}</h1>
+            <span className="texte-gris">
+              {rayon.items.length} article{rayon.items.length > 1 ? 's' : ''}
+            </span>
+          </div>
+        )}
+      </header>
 
       {erreur && (
         <div className="alerte">
@@ -23,28 +40,35 @@ function RayonDetail() {
 
       {rayon && (
         <>
-          <header className="entete-liste">
-            <h1>{rayon.name}</h1>
-            <p className="sous-titre">
-              {rayon.items.length} article{rayon.items.length > 1 ? 's' : ''}
-            </p>
-          </header>
+          <input
+            type="text"
+            placeholder={`Chercher dans ${rayon.name}…`}
+            aria-label="Chercher dans ce rayon"
+            autoComplete="off"
+            value={filtre}
+            onChange={(e) => setFiltre(e.target.value)}
+          />
+
+          {itemsAffiches.length === 0 && (
+            <p className="texte-gris">Aucun article ne correspond.</p>
+          )}
 
           <section className="liste-articles">
-            {rayon.items.map((item, index) => (
+            {itemsAffiches.map((item) => (
               <div key={item.id} className="ligne-article">
-                <span className="numero-article">{String(index + 1).padStart(2, '0')}</span>
+                <span className="item-icone" aria-hidden="true">{iconeArticle(item.name, rayon.name)}</span>
                 <span className="nom-article">{item.name}</span>
 
                 {dansLaListe(item.name) ? (
-                  <span className="texte-gris">Dans la liste ✓</span>
+                  <span className="deja-dans-liste">✓ Dans la liste</span>
                 ) : (
                   <button
                     type="button"
-                    className="bouton-ajout"
+                    className="bouton-rond"
                     onClick={() => ajouterArticle(item)}
+                    aria-label={`Ajouter ${item.name} à la liste`}
                   >
-                    + Ajouter
+                    +
                   </button>
                 )}
               </div>

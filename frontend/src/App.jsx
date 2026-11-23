@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 import Accueil from './components/Accueil'
 import ListeCourses from './components/Listecourse'
@@ -8,13 +8,17 @@ import RayonDetail from './components/RayonDetail'
 import RegisterForm from './components/RegisterForm'
 import RouteProtegee from './components/RouteProtegee'
 import Connexion from './pages/Connexion'
+import EnteteAuth from './components/EnteteAuth'
 
 function App() {
   const { utilisateur } = useAuth()
+  const { pathname } = useLocation()
+  const surPageAuth = pathname === '/connexion' || pathname === '/inscription'
 
   return (
     <div className="app">
       <main className="page">
+        {surPageAuth && <EnteteAuth />}
         <Routes>
           <Route path="/connexion" element={<Connexion />} />
           <Route path="/inscription" element={<RegisterForm />} />

@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
 import { useListe } from '../ListeContext'
 import { useAuth } from '../AuthContext'
+import { useCategories } from '../useCategories'
+import { iconeRayon } from '../iconesRayons'
 
 function Accueil() {
   const { articles } = useListe()
   const { utilisateur } = useAuth()
+  const { categories } = useCategories()
   const prenom = utilisateur?.firstName ?? ''
 
   const total = articles.length
@@ -15,39 +18,67 @@ function Accueil() {
 
   return (
     <>
-      <header className="entete">
-        <span className="texte-gris">Bonjour</span>
-        <h1>{prenom}</h1>
+      <header className="barre-haut">
+        <span className="avatar" aria-hidden="true">{prenom.charAt(0).toUpperCase()}</span>
+        <div>
+          <span className="texte-gris">Bonjour</span>
+          <h1>{prenom}</h1>
+        </div>
       </header>
 
-      <section className="carte" aria-labelledby="titre-liste">
-        <div className="titre-ligne">
-          <h2 id="titre-liste">Ma liste de courses</h2>
-          <span className="texte-gris">En cours</span>
-        </div>
+      <section className="hero" aria-labelledby="titre-liste">
+        <h2 id="titre-liste" className="hero-etiquette">Ma liste de courses</h2>
 
-        <p className="progression-texte">
-          {restants} article{restants > 1 ? 's' : ''} à acheter
-        </p>
-        <div className="barre" aria-hidden="true">
-          <div className="barre-remplie" style={{ width: `${pourcentage}%` }} />
-        </div>
+        {total === 0 ? (
+          <>
+            <p className="hero-chiffre">
+              <strong>0</strong>
+              <span>Ta liste est vide pour l’instant</span>
+            </p>
+            <Link to="/rayons" className="bouton bouton-hero">Ajouter des articles</Link>
+          </>
+        ) : (
+          <>
+            <p className="hero-chiffre">
+              <strong>{restants}</strong>
+              <span>{restants === 0 ? 'Tout est pris, bravo !' : `article${restants > 1 ? 's' : ''} à acheter`}</span>
+            </p>
 
-        <div>
-          {prochains.map((item) => (
-            <div key={item.id} className="ligne-article">
-              <span>○</span>
-              <span className="nom-article">{item.nom}</span>
+            <div className="barre" aria-hidden="true">
+              <div className="barre-remplie" style={{ width: `${pourcentage}%` }} />
             </div>
-          ))}
-        </div>
+            <p className="hero-detail">{pris} pris sur {total}</p>
 
-        <Link to="/liste" className="bouton">Voir toute la liste</Link>
+            {prochains.length > 0 && (
+              <ul className="hero-puces">
+                {prochains.map((item) => (
+                  <li key={item.id}>{item.nom || item.name}</li>
+                ))}
+              </ul>
+            )}
+
+            <Link to="/liste" className="bouton bouton-hero">Voir toute la liste</Link>
+          </>
+        )}
       </section>
 
-      <Link to="/rayons" className="bouton bouton-secondaire" style={{ marginTop: 12 }}>
-          Voir tous les rayons
-        </Link>
+      <div className="titre-ligne">
+        <h2>Rayons</h2>
+        <Link to="/rayons" className="lien-discret">Tout voir</Link>
+      </div>
+
+      <div className="rayons-defilants">
+        {categories.map((categorie, index) => (
+          <Link
+            key={categorie.id}
+            to={`/rayons/${categorie.id}`}
+            className={`tuile tuile-${(index % 4) + 1}`}
+          >
+            <span className="tuile-icone" aria-hidden="true">{iconeRayon(categorie.name)}</span>
+            <span className="tuile-nom">{categorie.name}</span>
+          </Link>
+        ))}
+      </div>
     </>
   )
 }
