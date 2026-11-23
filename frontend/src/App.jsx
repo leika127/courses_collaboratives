@@ -7,6 +7,7 @@ import Rayons from './components/Rayons'
 import RayonDetail from './components/RayonDetail'
 import RegisterForm from './components/RegisterForm'
 import RouteProtegee from './components/RouteProtegee'
+import Utilisateurs from './components/compte/Utilisateurs'
 import Connexion from './pages/Connexion'
 import EnteteAuth from './components/EnteteAuth'
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/liste" element={<RouteProtegee><ListeCourses /></RouteProtegee>} />
           <Route path="/rayons" element={<RouteProtegee><Rayons /></RouteProtegee>} />
           <Route path="/rayons/:id" element={<RouteProtegee><RayonDetail /></RouteProtegee>} />
+          <Route path="/utilisateurs" element={<RouteProtegee><Utilisateurs /></RouteProtegee>} />
         </Routes>
       </main>
       {utilisateur && <Navbarre />}
