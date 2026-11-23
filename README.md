@@ -49,7 +49,7 @@ cette appli ciblera les familles mais principalement la personne du foyer qui fe
 |---|---|
 | Frontend | React (Vite) + React Router |
 | Backend | Node.js + Express |
-| Base de données | PostgreSQL 16 (via Docker) |
+| Base de données | PostgreSQL 18 (via Docker) |
 | Qualité du code | ESLint |
 
 Le choix de cette stack est justifié dans les ADR : voir le dossier `docs/adr/`.
@@ -60,11 +60,16 @@ Le choix de cette stack est justifié dans les ADR : voir le dossier `docs/adr/`
 
 Installer ces outils avant de commencer :
 
-| Outil | Version | Vérifier l'installation |
-|---|---|---|
-| [Node.js](https://nodejs.org/) (fournit npm) | LTS | `node -v` et `npm -v` |
-| [Git](https://git-scm.com/) | récente | `git --version` |
-| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | récente | `docker --version` |
+| Outil | Version minimale | Version testée | Vérifier l'installation |
+|---|---|---|---|
+| [Node.js](https://nodejs.org/) | 20.19, 22.13 ou 24 et plus | 26.10.0 | `node -v` |
+| npm (fourni avec Node.js) | 10 | 11.19.1 | `npm -v` |
+| [Git](https://git-scm.com/) | 2.40 | 2.56.1 | `git --version` |
+| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Docker 24 + Compose v2 | Docker 29.9.3, Compose v5.7.0 | `docker --version` et `docker compose version` |
+| PostgreSQL | 18 (image Docker `postgres:18`) | 18 | aucune installation : fourni par Docker |
+
+> Le minimum de Node.js vient des dépendances du projet (ESLint 10 et Vite 8).
+> Python n'est pas nécessaire.
 
 Docker Desktop doit être **lancé** (icône active) avant de démarrer la base de données.
 
