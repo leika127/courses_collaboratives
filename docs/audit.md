@@ -20,9 +20,6 @@
 - `.DS_Store`, `.vscode` et `*.log` ajoutés au `.gitignore` (PR #67).
 - `.DS_Store` retiré du dépôt avec `git rm --cached .DS_Store` (PR #67).
 - Failles des dépendances corrigées avec `npm audit fix` dans `backend` : `body-parser` 2.3.0 → 2.4.0 et `qs` 6.16.0 → 6.17.1 (PR #68).
-  Résultat : `npm audit --omit=dev` affiche 0 vulnérabilité.- `.DS_Store`, `.vscode` et `*.log` ajoutés au `.gitignore` (PR #67).
-- `.DS_Store` retiré du dépôt avec `git rm --cached .DS_Store` (PR #67).
-- Failles des dépendances corrigées avec `npm audit fix` dans `backend` : `body-parser` 2.3.0 → 2.4.0 et `qs` 6.16.0 → 6.17.1 (PR #68).
   Résultat : `npm audit --omit=dev` affiche 0 vulnérabilité.
 
 ## Ce qui reste à faire
