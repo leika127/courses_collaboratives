@@ -11,10 +11,13 @@
 - [x] Autres fichiers problématiques ?
       Dans .gitignore, ajout des dossiers .DS_Store, .vscode et \*.log non encore commités
 
+- [x] Dépendances vulnérables ? **Oui, dans le backend**
+      `body-parser` 2.3.0 (gravité haute : déni de service) et `qs` 6.16.0 (gravité moyenne).
+      Vérifié avec : `npm audit` dans `backend`
+
 ## Ce qui a été corrigé
 
 - ajout des fichiers et dossiers .DS_Store, .vscode et \*.log dans .gitignore...
+- le .env est vérifié, le .gitignore complété, .DS_Store retiré et les failles graves corrigées.
 
 ## Ce qui reste à faire
-
-- PR de la modif .gitignore
