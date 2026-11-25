@@ -332,14 +332,14 @@ courses_collaboratives/
 
 ## Contribuer
 
-Les règles complètes sont dans le fichier **docs** qui se trouve à la racine du dossier
+Les règles complètes sont dans le dossier `docs/adr/` (ADR 0001 à 0004).
 
 En résumé :
 
 - `main` : version stable, protégée.
 - `dev` : branche de travail commune, protégée.
-- Chaque tâche se fait sur une sous-branche créée depuis `dev` (`feature/…`, `fix/…`, `docs/…`).
-- Toute modification passe par une **pull request vers `dev`**, relue et approuvée par l'autre membre de l'équipe.
+- Chaque tâche se fait sur une sous-branche créée depuis `dev` (`feat/…`, `fix/…`, `docs/…`, `chore/…`).
+- Toute modification passe par une **pull request vers `dev`**, relue et approuvée par un autre membre de l'équipe.
 - Les messages de commit suivent la convention [Conventional Commits](https://www.conventionalcommits.org/fr/) (`feat:`, `fix:`, `docs:`, `chore:`…).
 
 ---
